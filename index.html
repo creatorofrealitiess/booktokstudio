@@ -685,6 +685,10 @@ function parseGeminiSceneResponse(text){const r={hook:"",caption:"",context:"",e
 // 1. Split tuples that contain BOTH dialogue and narration
 // 2. Fix _flow tags: dialogue gets _flow, narrative continuation gets plain tag
 function autoFixFlowTags(rawTuple) {
+  // Normalize curly quotes and escaped quotes before processing
+  rawTuple = rawTuple.replace(/[\u201C\u201D]/g, '"').replace(/[\u2018\u2019]/g, "'");
+  rawTuple = rawTuple.replace(/\\"/g, '"');
+
   const lines = rawTuple.split('\n');
   const result = [];
 
