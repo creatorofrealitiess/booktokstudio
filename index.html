@@ -898,6 +898,15 @@ function BookTokApp(){
   const[chatContextMode,setChatContextMode]=useState("full"); // "excerpt" or "full"
   const chatEndRef=useRef(null);
   const chatInputRef=useRef(null);
+  // Hook Forge
+  const[hookVariants,setHookVariants]=useState([]);
+  const[hookForgeLoading,setHookForgeLoading]=useState(false);
+  const[hookForgeError,setHookForgeError]=useState("");
+  const[hookForgeOpen,setHookForgeOpen]=useState(false);
+  // Caption Builder
+  const[mysteryMode,setMysteryMode]=useState(false);
+  const[detectedTropes,setDetectedTropes]=useState([]);
+  const[captionGenLoading,setCaptionGenLoading]=useState(false);
 
   useEffect(()=>{
     Promise.all([dbGetAll(),dbGetCats(),dbGetBooks()]).then(([ph,cats,bks])=>{
@@ -1086,7 +1095,7 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
   const doRender=useCallback(()=>{const entries=parseTupleData(tupleRaw);if(!entries.length){setError("No valid tuple data.");return}document.fonts.load(`500 ${fontSize}px "${fontName}"`).then(()=>{renderKindle(canvasRef.current,buildGroups(entries),2,fontName,fontSize);setRendered(true)})},[tupleRaw,fontName,fontSize]);
   const doCopy=useCallback(async()=>{try{const blob=await new Promise(r=>canvasRef.current.toBlob(r,'image/png'));await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);setCopied(true);setTimeout(()=>setCopied(false),2000)}catch(e){console.error(e)}},[]);
   const copyField=useCallback(async(text,field)=>{try{await navigator.clipboard.writeText(text);setCopiedField(field);setTimeout(()=>setCopiedField(""),1500)}catch(e){console.error(e)}},[]);
-  const resetAll=useCallback(()=>{setStep("upload");setActiveTab("generate");setPdfFile(null);setPdfText("");setSelectedVibe("");setCustomVibe("");setHook("");setCaption("");setContext("");setTupleRaw("");setRendered(false);setAuthor("");setError("");setSelectedPhotos([]);setAiPickedPhotos([]);setSelectedBook(null);setChatMessages([]);setChatOpen(false)},[]);
+  const resetAll=useCallback(()=>{setStep("upload");setActiveTab("generate");setPdfFile(null);setPdfText("");setSelectedVibe("");setCustomVibe("");setHook("");setCaption("");setContext("");setTupleRaw("");setRendered(false);setAuthor("");setError("");setSelectedPhotos([]);setAiPickedPhotos([]);setSelectedBook(null);setChatMessages([]);setChatOpen(false);setHookVariants([]);setHookForgeOpen(false);setHookForgeError("");setDetectedTropes([]);setMysteryMode(false);window._pinterestSearches=null},[]);
 
   // Auto-scroll chat to bottom
   useEffect(()=>{if(chatEndRef.current)chatEndRef.current.scrollIntoView({behavior:"smooth"})},[chatMessages,chatLoading]);
@@ -1132,6 +1141,124 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
     setChatLoading(false);
   },[chatInput,apiKey,model,chatMessages,chatContextMode,pdfText,tupleRaw,author,selectedVibe,customVibe,hook,caption,context]);
 
+  // === HOOK FORGE: Generate 5 hook variants using Anthropic ===
+  const generateHookVariants=useCallback(async()=>{
+    if(!anthropicKey.trim()){setHookForgeError("Add your Anthropic API key on the Generate tab to use Hook Forge.");return}
+    const excerptText=tupleRaw?parseTupleData(tupleRaw).map(e=>e.text).join(' '):'';
+    if(!excerptText&&!context&&!hook){setHookForgeError("Generate an excerpt first.");return}
+    setHookForgeLoading(true);setHookForgeError("");setHookVariants([]);setHookForgeOpen(true);
+    try{
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:2048,messages:[{role:"user",content:`You are a BookTok hook specialist for romance slideshows. Your hooks go on the FIRST SLIDE of a TikTok slideshow — overlaid on a romantic/aesthetic photo.
+
+The user has a book scene with this context:
+- Current hook: ${hook}
+- Scene context: ${context}
+- Excerpt: ${excerptText.substring(0,800)}
+
+Generate EXACTLY 7 hook variants. Each hook must:
+- End with an em dash — (to create curiosity/cliffhanger)
+- Use third person ("she", "he", "they") — NOT second person ("you")
+- Be designed to make someone STOP scrolling and SWIPE to read the excerpt
+
+THE 7 VARIANTS (generate exactly these types):
+
+1. SHORT EMOTIONAL (8-12 words max). Name the TROPE or FEELING, don't narrate plot. Examples: "When the enemies are starting to become lovers—", "When the mafia don finally breaks—", "It's enemies to lovers and he can't breathe—"
+
+2. SHORT EMOTIONAL ALT (8-12 words). Different angle, same short format. Go for a different emotion than #1.
+
+3. CURIOSITY GAP (15-25 words). Set up a specific scenario that creates devastating curiosity. Examples: "She overhears him saying she's 'just some girl' and decides to end their fake relationship thinking he won't care but this is his reaction—", "She tells her arranged mafia husband she hates him but then it gets revealed that—"
+
+4. CURIOSITY GAP ALT (15-25 words). Different moment or angle from the same scene.
+
+5. FEMALE POV (10-20 words). Write a hook showing HER side of the dynamic — what she is doing, feeling, or experiencing. Examples: "She can't breathe when he looks at her like that—", "She's staying up late studying when he shows up at her door—", "She tells herself she hates him but her voice breaks when—"
+
+6. MALE POV (10-20 words). Write a hook showing HIS side of the dynamic — a COMPLEMENTARY moment that pairs with the Female POV. NOT the same moment retold — a DIFFERENT action or feeling that together with #5 paints the full picture. Think: she does X, he does Y, and together they show the tension. Examples: "She's staying up late to study—" paired with "Him ditching the party to go find her—", or "She swears she doesn't care—" paired with "Him memorizing every detail about her like his life depends on it—"
+
+7. TROPE STACKER (10-15 words). Lead with the tropes stacked together. Example: "It's arranged marriage, enemies to lovers, and he just called her 'my wife'—", "Forced proximity + grumpy sunshine + he can't stop staring—"
+
+CRITICAL RULES:
+- Every hook MUST end with an em dash —
+- NO book titles, NO author names in the hooks
+- Short hooks should be FEELINGS not plot summaries
+- Curiosity gap hooks should make the reader NEED to swipe
+- Female POV and Male POV should be COMPLEMENTARY actions/feelings — together they paint the full dynamic, like two slides in a set
+- Be specific to THIS scene, not generic
+
+Respond with ONLY a JSON array of objects. No markdown, no backticks, no explanation.
+[{"type":"short_emotional","hook":"..."},{"type":"short_emotional_alt","hook":"..."},{"type":"curiosity_gap","hook":"..."},{"type":"curiosity_gap_alt","hook":"..."},{"type":"female_pov","hook":"..."},{"type":"male_pov","hook":"..."},{"type":"trope_stack","hook":"..."}]`}]})});
+      if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e?.error?.message||`API ${res.status}`)}
+      const data=await res.json();const txt=(data?.content?.[0]?.text||"").trim();
+      // Parse JSON - handle potential markdown wrapping
+      const clean=txt.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
+      const variants=JSON.parse(clean);
+      if(Array.isArray(variants))setHookVariants(variants);
+      else throw new Error("Unexpected response format");
+    }catch(e){setHookForgeError("Hook Forge failed: "+e.message)}
+    setHookForgeLoading(false);
+  },[anthropicKey,hook,context,tupleRaw]);
+
+  // === CAPTION BUILDER: Auto-detect tropes and build caption ===
+  const detectTropesAndBuildCaption=useCallback(async()=>{
+    if(!anthropicKey.trim()){return}
+    const excerptText=tupleRaw?parseTupleData(tupleRaw).map(e=>e.text).join(' '):'';
+    if(!excerptText&&!context)return;
+    setCaptionGenLoading(true);
+    try{
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1024,messages:[{role:"user",content:`Analyze this romance book excerpt and identify the tropes present.
+
+Scene context: ${context}
+Current hook: ${hook}
+Excerpt: ${excerptText.substring(0,600)}
+
+Return ONLY a JSON object with:
+1. "tropes" - array of trope strings in lowercase (e.g. "enemies to lovers", "arranged marriage", "forced proximity", "mafia romance", "he falls first", "grumpy x sunshine", "stalker romance", "hockey romance", "fake dating", "brother's best friend", "dark romance", "possessive hero", "touch her and die", "bratva romance", "dragon shifter", "fantasy romance", "second chance", "forbidden love", etc.)
+2. "reaction" - a short emotional reaction line (3-6 words, no emoji, for the caption first line). Make it feel like a real reader's gut reaction. Examples: "The way he chose her", "I am not okay right now", "He really said that to her", "This man will be the death of me", "The yearning is killing me"
+3. "pinterest_searches" - array of 3-4 Pinterest search strings that would find good background images for this scene's mood (e.g. "dark couple aesthetic cinematic", "man holding woman possessive", "ice rink couple hockey", "fantasy castle couple dramatic")
+
+No markdown, no backticks.
+{"tropes":["..."],"reaction":"...","pinterest_searches":["..."]}`}]})});
+      if(!res.ok)throw new Error(`API ${res.status}`);
+      const data=await res.json();const txt=(data?.content?.[0]?.text||"").trim();
+      const clean=txt.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
+      const result=JSON.parse(clean);
+      if(result.tropes)setDetectedTropes(result.tropes);
+      // Auto-build caption if we have the data
+      if(result.reaction&&result.tropes){
+        const bookLine=author||"[Book Title] by [Author]";
+        const tropeStr=result.tropes.map(t=>t.endsWith('.')?t:t+'.').join(' ');
+        const newCaption=mysteryMode
+          ?`${result.reaction}\n${tropeStr}`
+          :`${result.reaction}\n📚 : ${bookLine}\n${tropeStr}`;
+        setCaption(newCaption);
+      }
+      if(result.pinterest_searches){
+        // Store for Pinterest helper display
+        setDetectedTropes(prev=>result.tropes||prev);
+        // We'll display pinterest_searches in the UI
+        window._pinterestSearches=result.pinterest_searches;
+      }
+    }catch(e){console.error("Caption builder error:",e)}
+    setCaptionGenLoading(false);
+  },[anthropicKey,hook,context,tupleRaw,author,mysteryMode]);
+
+  // Rebuild caption when mystery mode toggles
+  useEffect(()=>{
+    if(!caption)return;
+    const lines=caption.split('\n').filter(l=>l.trim());
+    if(mysteryMode){
+      // Remove book title line (the one with 📚)
+      const filtered=lines.filter(l=>!l.includes('📚'));
+      setCaption(filtered.join('\n'));
+    } else {
+      // Add book title line back if missing
+      if(!caption.includes('📚')&&author){
+        const reaction=lines[0]||'';
+        const tropes=lines.filter(l=>!l.includes('📚')&&l!==reaction).join('\n');
+        setCaption(`${reaction}\n📚 : ${author}\n${tropes}`);
+      }
+    }
+  },[mysteryMode]);
+
   const tabStyle=(t)=>({padding:"8px 18px",fontSize:"12px",fontWeight:600,cursor:"pointer",border:"none",borderBottom:activeTab===t?"2px solid #fff":"2px solid transparent",backgroundColor:"transparent",color:activeTab===t?"#ddd":"#555",fontFamily:UI_FONT,transition:"all 0.15s",letterSpacing:"0.3px"});
   const catTabStyle=(id)=>({padding:"6px 14px",fontSize:"12px",fontWeight:500,cursor:"pointer",border:"1px solid",borderColor:activeCatId===id?"#555":"#1a1a1a",borderRadius:"20px",backgroundColor:activeCatId===id?"#1e1e1e":"transparent",color:activeCatId===id?"#ddd":"#555",fontFamily:UI_FONT,transition:"all 0.15s",whiteSpace:"nowrap"});
   const CopyBtn=({field,text})=>(<button onClick={()=>copyField(text,field)} style={{...ST.btn,padding:"3px 10px",fontSize:"10px",backgroundColor:"transparent",color:copiedField===field?"#5cb85c":"#555",border:`1px solid ${copiedField===field?"#2a5a2a":"#222"}`}}>{copiedField===field?"✓ Copied":"Copy"}</button>);
@@ -1144,12 +1271,12 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
         <div style={{display:"flex",alignItems:"center",gap:"12px"}}>
           <span style={{fontSize:"20px"}}>📖</span>
           <span style={{fontSize:"16px",fontWeight:700,letterSpacing:"-0.3px"}}>BookTok Studio</span>
-          <span style={{fontSize:"9px",padding:"2px 7px",borderRadius:"3px",backgroundColor:"#1a1a1a",color:"#555",fontFamily:"'DM Mono',monospace",border:"1px solid #222",letterSpacing:"0.5px"}}>v5.0</span>
+          <span style={{fontSize:"9px",padding:"2px 7px",borderRadius:"3px",backgroundColor:"#1a1a1a",color:"#555",fontFamily:"'DM Mono',monospace",border:"1px solid #222",letterSpacing:"0.5px"}}>v6.0</span>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:"12px"}}>
           {step==="results"&&<button onClick={resetAll} style={{...ST.btn,backgroundColor:"transparent",color:"#555",border:"1px solid #222",fontSize:"11px",padding:"6px 12px"}}>← New Book</button>}
           {step!=="results"&&<button onClick={()=>{setStep("results");setActiveTab("results")}} style={{...ST.btn,backgroundColor:"transparent",color:"#333",border:"1px solid #1a1a1a",fontSize:"11px",padding:"6px 12px"}}>Skip to Results ↗</button>}
-          <span style={{fontSize:"10px",color:"#333",fontFamily:"'DM Mono',monospace"}}>gemini-powered</span>
+          <span style={{fontSize:"10px",color:"#333",fontFamily:"'DM Mono',monospace"}}>gemini + claude powered</span>
         </div>
       </div>
 
@@ -1380,9 +1507,82 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}}><label style={{...ST.label,marginBottom:0}}>Hook (Slide 1)</label><CopyBtn field="hook" text={hook} /></div>
               <textarea value={hook} onChange={e=>setHook(e.target.value)} style={{...ST.input,height:"60px",resize:"vertical",fontSize:"14px",fontWeight:600,color:"#eee"}} />
             </div>
+
+            {/* === HOOK FORGE === */}
+            <div style={{...ST.card,border:hookForgeOpen?"1px solid #2a2a1a":"1px solid #1a1a1a",transition:"border-color 0.2s"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:hookForgeOpen?"10px":"0"}}>
+                <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
+                  <span style={{fontSize:"13px"}}>⚡</span>
+                  <label style={{...ST.label,marginBottom:0,color:"#b8a040"}}>Hook Forge</label>
+                  <span style={{fontSize:"9px",padding:"1px 6px",borderRadius:"3px",backgroundColor:"#1a1a0f",color:"#8b8040",fontFamily:"'DM Mono',monospace",border:"1px solid #2a2a1a"}}>Claude-powered</span>
+                </div>
+                <button onClick={hookForgeLoading?undefined:generateHookVariants} disabled={hookForgeLoading} style={{...ST.btn,padding:"5px 14px",fontSize:"10px",backgroundColor:hookForgeLoading?"#1a1a1a":"#2a2a1a",color:hookForgeLoading?"#555":"#d4c060",border:"1px solid #3a3a2a",transition:"all 0.15s"}}>
+                  {hookForgeLoading?"Generating...":"Generate 7 Variants"}
+                </button>
+              </div>
+              {hookForgeError&&<div style={{fontSize:"11px",color:"#e55",fontFamily:"'DM Mono',monospace",padding:"6px 0"}}>{hookForgeError}</div>}
+              {hookForgeOpen&&hookVariants.length>0&&(
+                <div style={{display:"flex",flexDirection:"column",gap:"6px"}}>
+                  {hookVariants.map((v,i)=>{
+                    const typeLabels={"short_emotional":"Short Emotional","short_emotional_alt":"Short Emotional Alt","curiosity_gap":"Curiosity Gap","curiosity_gap_alt":"Curiosity Gap Alt","female_pov":"Female POV","male_pov":"Male POV","trope_stack":"Trope Stack"};
+                    const typeColors={"short_emotional":"#7eb8da","short_emotional_alt":"#7eb8da","curiosity_gap":"#da7e9e","curiosity_gap_alt":"#da7e9e","female_pov":"#e8a0c0","male_pov":"#80b8d8","trope_stack":"#dac87e"};
+                    const isFirstPov=v.type==="female_pov";
+                    const isLastPov=v.type==="male_pov";
+                    return(
+                      <React.Fragment key={i}>
+                        {isFirstPov&&(
+                          <div style={{fontSize:"9px",textTransform:"uppercase",letterSpacing:"1.5px",color:"#555",fontFamily:"'DM Mono',monospace",padding:"6px 0 2px 0",borderTop:"1px solid #1a1a1a",marginTop:"2px"}}>POV Pair — her side + his side</div>
+                        )}
+                        <div style={{display:"flex",gap:"8px",alignItems:"flex-start",padding:"8px 10px",backgroundColor:isFirstPov||isLastPov?"#121218":"#111",borderRadius:isFirstPov?"6px 6px 0 0":isLastPov?"0 0 6px 6px":"6px",border:"1px solid #1a1a1a",borderBottom:isFirstPov?"1px dashed #252530":"1px solid #1a1a1a",borderTop:isLastPov?"none":"1px solid #1a1a1a",transition:"border-color 0.15s",cursor:"pointer"}} onClick={()=>setHook(v.hook)} onMouseEnter={e=>e.currentTarget.style.borderColor='#333'} onMouseLeave={e=>e.currentTarget.style.borderColor='#1a1a1a'}>
+                          <span style={{fontSize:"9px",padding:"2px 6px",borderRadius:"3px",backgroundColor:"#0f0f0f",color:typeColors[v.type]||"#888",fontFamily:"'DM Mono',monospace",border:"1px solid #1a1a1a",whiteSpace:"nowrap",flexShrink:0,marginTop:"2px"}}>{typeLabels[v.type]||v.type}</span>
+                          <span style={{fontSize:"12px",color:"#ccc",lineHeight:"1.5",flex:1}}>{v.hook}</span>
+                          <button onClick={e=>{e.stopPropagation();copyField(v.hook,"hv"+i)}} style={{...ST.btn,padding:"2px 8px",fontSize:"9px",backgroundColor:"transparent",color:copiedField==="hv"+i?"#5cb85c":"#444",border:"1px solid #1a1a1a",flexShrink:0}}>{copiedField==="hv"+i?"✓":"Copy"}</button>
+                        </div>
+                        {isLastPov&&<div style={{height:"2px"}} />}
+                      </React.Fragment>
+                    );
+                  })}
+                  <div style={{fontSize:"10px",color:"#444",fontFamily:"'DM Mono',monospace",textAlign:"center",padding:"4px 0"}}>Click any hook to use it as your main hook</div>
+                </div>
+              )}
+            </div>
+
+            {/* === CAPTION BUILDER === */}
             <div style={ST.card}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}}><label style={{...ST.label,marginBottom:0}}>Caption</label><CopyBtn field="caption" text={caption} /></div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}}>
+                <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
+                  <label style={{...ST.label,marginBottom:0}}>Caption</label>
+                  <button onClick={()=>setMysteryMode(!mysteryMode)} style={{padding:"2px 8px",fontSize:"9px",borderRadius:"10px",border:"1px solid",cursor:"pointer",fontFamily:"'DM Mono',monospace",borderColor:mysteryMode?"#4a2540":"#1a1a1a",backgroundColor:mysteryMode?"#2a1525":"transparent",color:mysteryMode?"#da7e9e":"#555",transition:"all 0.15s"}} title="Mystery mode hides the book title to drive comments">{mysteryMode?"🔮 Mystery Mode":"📖 Normal Mode"}</button>
+                  {anthropicKey.trim()&&(
+                    <button onClick={detectTropesAndBuildCaption} disabled={captionGenLoading} style={{padding:"2px 8px",fontSize:"9px",borderRadius:"10px",border:"1px solid #2a2a1a",cursor:"pointer",fontFamily:"'DM Mono',monospace",backgroundColor:captionGenLoading?"#1a1a1a":"#1a1a0f",color:captionGenLoading?"#555":"#b8a040",transition:"all 0.15s"}}>{captionGenLoading?"Detecting...":"Auto-detect Tropes"}</button>
+                  )}
+                </div>
+                <CopyBtn field="caption" text={caption} />
+              </div>
+              {mysteryMode&&<div style={{fontSize:"10px",color:"#da7e9e",fontFamily:"'DM Mono',monospace",marginBottom:"6px",padding:"4px 8px",backgroundColor:"#1a0f15",borderRadius:"4px",border:"1px solid #2a1520"}}>Mystery mode: book title hidden. Drop it in the comments to drive engagement.</div>}
               <textarea value={caption} onChange={e=>setCaption(e.target.value)} style={{...ST.input,height:"110px",resize:"vertical",fontSize:"12px",lineHeight:"1.6"}} />
+              {detectedTropes.length>0&&(
+                <div style={{marginTop:"8px"}}>
+                  <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
+                    {detectedTropes.map((t,i)=>(
+                      <span key={i} style={{fontSize:"10px",padding:"2px 8px",borderRadius:"10px",backgroundColor:"#151515",color:"#888",border:"1px solid #1f1f1f",fontFamily:"'DM Mono',monospace"}}>{t}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {window._pinterestSearches&&window._pinterestSearches.length>0&&(
+                <div style={{marginTop:"8px",padding:"8px 10px",backgroundColor:"#0f1010",borderRadius:"6px",border:"1px solid #1a1f1a"}}>
+                  <div style={{fontSize:"9px",textTransform:"uppercase",letterSpacing:"1px",color:"#5a8a5a",marginBottom:"6px",fontFamily:"'DM Mono',monospace"}}>Pinterest Search Suggestions</div>
+                  <div style={{display:"flex",flexDirection:"column",gap:"4px"}}>
+                    {window._pinterestSearches.map((s,i)=>(
+                      <div key={i} style={{display:"flex",alignItems:"center",gap:"6px"}}>
+                        <span style={{fontSize:"11px",color:"#8b8",fontFamily:"'DM Mono',monospace",flex:1}}>{s}</span>
+                        <button onClick={()=>copyField(s,"ps"+i)} style={{...ST.btn,padding:"1px 6px",fontSize:"9px",backgroundColor:"transparent",color:copiedField==="ps"+i?"#5cb85c":"#444",border:"1px solid #1a1a1a"}}>{copiedField==="ps"+i?"✓":"Copy"}</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <div style={ST.card}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}}><label style={{...ST.label,marginBottom:0}}>Context</label><CopyBtn field="context" text={context} /></div>
