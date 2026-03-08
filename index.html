@@ -1175,56 +1175,69 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
     if(!excerptText&&!context&&!hook){setHookForgeError("Generate an excerpt first.");return}
     setHookForgeLoading(true);setHookForgeError("");setHookVariants([]);setHookForgeOpen(true);
     try{
-      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:claudeModel,max_tokens:2048,messages:[{role:"user",content:`You are a BookTok hook specialist for romance slideshows. You deeply understand romance BookTok — the tropes, the emotional triggers, what makes readers stop scrolling. Your hooks go on the FIRST SLIDE of a TikTok slideshow overlaid on a romantic/aesthetic photo.
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:claudeModel,max_tokens:2048,messages:[{role:"user",content:`You write hooks for BookTok romance slideshows. A hook is text overlaid on a moody photo — it must make someone STOP scrolling in under 2 seconds and NEED to swipe.
 
-CONTEXT FOR THIS SCENE:
-- Current hook: ${hook}
-- Scene context: ${context}
+THIS SCENE:
+- Hook so far: ${hook}
+- Context: ${context}
 - Excerpt: ${excerptText.substring(0,800)}
 
-Generate EXACTLY 7 hook variants. EVERY hook must end with an em dash —
+Generate EXACTLY 7 hooks. ALL must end with —
 
-WHAT MAKES A HOOK VIRAL ON ROMANCE BOOKTOK:
-- It triggers an EMOTION in under 3 seconds (longing, heartbreak, butterflies, rage, possessiveness)
-- It names a trope readers already fantasize about (enemies to lovers, arranged marriage, grumpy x sunshine)
-- It creates a curiosity gap so painful the reader HAS to swipe
-- It uses language romance readers actually use: "obsessed," "unhinged," "down bad," "broke me," "wrecked"
-- Short hooks that name a FEELING outperform long hooks that explain plot
-- The best hooks make the reader feel something BEFORE they even read the excerpt
+=== WHAT ACTUALLY GOES VIRAL ===
+The #1 rule: hooks that NAME A FEELING or TROPE crush hooks that DESCRIBE PLOT.
+- "When the enemies are starting to become lovers—" → 112K views (8 words. names the trope. done.)
+- "It's enemies to lovers and he's getting jealous—" → 5.8K views (trope + one emotion)
+These work because every romance reader has FANTASIZED about this exact trope. The hook activates that fantasy instantly.
 
-HOOKS THAT HAVE GONE VIRAL (study these patterns):
-- "When the enemies are starting to become lovers—" (112K views — pure trope naming, 8 words)
-- "It's enemies to lovers and he's getting jealous—" (5.8K views — trope + specific emotion)
-- "She overhears him saying that she's 'just some girl' and decides to end their fake relationship thinking he won't care but this is his reaction—" (6.7K likes — devastating curiosity gap)
-- "He doesn't deny being a monster. He just promises to be *her* monster—" (strong male POV)
-- "When it's arranged marriage between exes and she expects him to sleep on the sofa but he—" (2.4K views — setup with cliffhanger)
-- "Her room is too cold to sleep in so she has to begrudgingly ask her arranged husband, the dragon king, for a better room but then he—" (3.1K views — specific scenario)
+For curiosity gaps, the setup must feel like a CLIFFHANGER — you dangle something specific and cut off right before the payoff:
+- "She overhears him saying she's 'just some girl' and decides to end their fake relationship thinking he won't care but this is his reaction—" → 6.7K likes
+- "Her room is too cold so she asks her arranged husband the dragon king for a better room but then he—" → 3.1K views
+These work because the reader already FEELS the heartbreak and NEEDS to see what happens.
 
-THE 7 VARIANTS:
+=== THE BIGGEST MISTAKE ===
+DO NOT summarize the scene. DO NOT narrate what happens. DO NOT write a book blurb.
+BAD: "He married his enemy's sister for revenge, but his possessiveness gave his secret away." ← This is a SUMMARY. It tells the whole story. There's no reason to swipe.
+GOOD: "When the revenge marriage stops being fake—" ← This is a FEELING. The reader needs to know MORE.
 
-1. SHORT EMOTIONAL (8-12 words MAXIMUM. Count them.). Name the trope or feeling. Do NOT narrate plot. This should read like a sigh, a gut punch, a flutter. Examples: "When the enemies are starting to become lovers—", "It's forced proximity and neither of them can sleep—", "When the ruthless one goes soft for her—"
+BAD: "She laughed in his face when he said she'd beg. Then he whispered in her ear—" ← Two sentences. Too much narration. Describes actions.
+GOOD: "She told him she'd never beg—" ← Short. Creates instant curiosity. What happened next?
 
-2. SHORT EMOTIONAL ALT (8-12 words MAXIMUM). Different emotion or trope angle than #1. Make the reader FEEL something different.
+=== THE 7 HOOKS ===
 
-3. CURIOSITY GAP (15-25 words). Build a specific scenario from this scene that creates unbearable curiosity. The reader must NEED to know what happens. Use details from the actual excerpt — character actions, dialogue setups, specific moments. End right before the payoff.
+1. SHORT EMOTIONAL (8-10 words MAX). Name the trope or the feeling. Nothing else. No plot. No character actions. Just the emotional core.
+Pattern: "When [trope situation]—" or "It's [trope] and [one emotional detail]—"
 
-4. CURIOSITY GAP ALT (15-25 words). Different angle or moment from the scene. Make it emotionally devastating in a different way than #3.
+2. SHORT EMOTIONAL ALT (8-10 words MAX). Different trope angle or emotion than #1.
 
-5. FEMALE POV (10-20 words). Show HER side — what she's doing, feeling, choosing. Make it feel like we're inside her head or watching her make a move.
+3. CURIOSITY GAP (15-25 words). Build a SPECIFIC scenario from this scene. Use one concrete detail from the excerpt — a line of dialogue, a specific action — and cut off RIGHT before the payoff. The reader should feel the emotion and desperately need to swipe. DO NOT resolve or hint at the resolution.
 
-6. MALE POV (10-20 words). Show HIS side — a COMPLEMENTARY moment. She does X, he does Y. Together they tell the story of the tension. NOT the same moment, a different action that shows HIS side of the dynamic.
+4. CURIOSITY GAP ALT (15-25 words). Different moment from the scene. Make it emotionally devastating in a DIFFERENT way.
 
-7. TROPE STACKER (10-15 words). Stack 2-3 tropes with plus signs or commas, then add a specific detail. Examples: "It's arranged marriage + enemies to lovers and he just said 'my wife'—", "Forced proximity + one bed + he won't stop staring at her—"
+5. FEMALE POV — write as a SHORT sentence fragment starting with "Her" or "She." Show what she's doing or feeling in this scene. Keep it under 12 words. Format: intimate, like a whisper.
+Example: "She thinks her arranged husband is cheating—"
+Example: "Her pretending she doesn't care when he walks in—"
+Example: "She told him to leave and he didn't—"
+
+6. MALE POV — write as a SHORT sentence fragment starting with "Him" or "He." Show what HE'S doing — a DIFFERENT, COMPLEMENTARY action. These two should feel like two halves of the same tension. Keep it under 12 words. Format: intimate.
+Example: "Him refusing to sleep apart from her—"
+Example: "Him memorizing everything about her like it's his job—"  
+Example: "Him showing up at her door at 2am—"
+The pair should create TENSION when read together — she does X, he does Y, and together they tell the story.
+
+7. TROPE STACKER (10-15 words). Stack 2-3 tropes with + signs then add ONE specific emotional detail from the scene.
+Example: "arranged marriage + enemies to lovers + he just called her 'my wife'—"
 
 HARD RULES:
-- Every hook MUST end with — (em dash)
-- NO book titles or author names
-- Use third person (she/he/they), NOT second person (you)
-- SHORT EMOTIONAL hooks must be 8-12 words. If it's over 12 words, it's TOO LONG. Rewrite shorter.
-- Be SPECIFIC to this excerpt. Use details from the actual scene — not generic romance filler.
-- Make every word earn its place. Cut filler words ruthlessly.
+- Every hook ends with —
+- NO book titles, NO author names
+- Third person only (she/he/her/him), never "you"
+- Short hooks: 8-10 words. If over 10, rewrite shorter.
+- POV hooks: capitalize first word, fragment style, under 12 words each
+- NEVER summarize. NEVER resolve. Always leave the reader NEEDING more.
+- Be specific to THIS scene — pull details from the excerpt.
 
-Respond with ONLY a JSON array. No markdown, no backticks, no explanation.
+JSON only. No markdown, no backticks.
 [{"type":"short_emotional","hook":"..."},{"type":"short_emotional_alt","hook":"..."},{"type":"curiosity_gap","hook":"..."},{"type":"curiosity_gap_alt","hook":"..."},{"type":"female_pov","hook":"..."},{"type":"male_pov","hook":"..."},{"type":"trope_stack","hook":"..."}]`}]})});
       if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e?.error?.message||`API ${res.status}`)}
       const data=await res.json();const txt=(data?.content?.[0]?.text||"").trim();
@@ -1535,7 +1548,7 @@ No markdown, no backticks.
             <div><label style={ST.label}>Author / Book</label><input value={author} onChange={e=>setAuthor(e.target.value)} placeholder="Author — Book Title" style={ST.input} /></div>
             <div>
               <label style={ST.label}>Tuple Data <span style={{textTransform:"none",color:"#c4bfb8"}}>(editable)</span></label>
-              <textarea value={tupleRaw} onChange={e=>setTupleRaw(e.target.value)} spellCheck={false} style={{...ST.input,height:"300px",resize:"vertical",color:"#e85d3a",fontSize:"11px",fontFamily:"'DM Sans', monospace",lineHeight:"1.5"}} />
+              <textarea value={tupleRaw} onChange={e=>setTupleRaw(e.target.value)} spellCheck={false} style={{...ST.input,height:"300px",resize:"vertical",color:"#e85d3a",fontSize:"11px",fontFamily:"'DM Sans', monospace",lineHeight:"1.5",backgroundColor:"#f0eeea"}} />
             </div>
             {error&&<div style={{padding:"8px 12px",backgroundColor:"#fef0ec",border:"1px solid #f5c6cb",borderRadius:"6px",color:"#dc3545",fontSize:"11px",fontFamily:"'DM Sans', sans-serif"}}>{error}</div>}
             <div style={{display:"flex",gap:"8px"}}>
