@@ -417,7 +417,7 @@ async function saveFcmToken(){
   try{
     if(!messaging||!user)return;
     // VAPID key — replace with yours from Firebase Console
-    const token=await messaging.getToken({vapidKey:'BEtoBJywZpECACDNg3KPItIHwdjQSqv649AeAkWFOBQxVEvYdyMXWFhl58kXsZ_kyNvh-KGrUxZYol4VWWAFB_Q'});
+    const token=await messaging.getToken({vapidKey:'YOUR_VAPID_KEY_HERE'});
     if(token){await db.ref(`users/${user.uid}/fcmTokens/${token}`).set(true);console.log('FCM token saved')}
   }catch(e){console.log('Token error:',e)}
 }
@@ -490,7 +490,8 @@ function setCF(f){calFilt=f;renderCal()}
 let tasks=[];
 function loadTasks(){if(!user)return;db.ref(`users/${user.uid}/tasks2`).on('value',s=>{tasks=Object.entries(s.val()||{}).map(([id,t])=>({id,...t}));if(curTab==='tasks')renderTasks();if(curTab==='taskcal')renderTaskCal()})}
 
-function renderTasks(){const el=document.getElementById('pgTask');const todayStr=new Date().toISOString().split('T')[0];
+function getLocalDateStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function renderTasks(){const el=document.getElementById('pgTask');const todayStr=getLocalDateStr();
 TASK_CATS.forEach(cat=>{if(openCats[cat]===undefined)openCats[cat]=true;PROJ_KEYS.forEach(pk=>{const k=cat+'-'+pk;if(openSubs[k]===undefined)openSubs[k]=false})});
 let h=`<div class="sec-hd"><div><div class="sec-t">Tasks</div><div class="sec-st">${tasks.filter(t=>!t.archived&&!t.done).length} pending</div></div><button class="task-hd-add" onclick="openTaskModal()">+ Add Task</button></div>`;
 
@@ -521,7 +522,7 @@ function formatDate(ds){const d=new Date(ds+'T00:00:00');const opts={month:'shor
 const AUTHOR_NAMES=['Lys','Lexi','Zara','Liv','Lila','Veda','Lara'];
 function getAuthorFromTask(text){for(const n of AUTHOR_NAMES){if(text.toLowerCase().includes(n.toLowerCase()))return n}return text.substring(0,6)}
 let tcalMo=new Date().getMonth(),tcalYr=new Date().getFullYear();
-function renderTaskCal(){const el=document.getElementById('pgTaskCal');const mos=['January','February','March','April','May','June','July','August','September','October','November','December'];const dys=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];const todayStr=new Date().toISOString().split('T')[0];
+function renderTaskCal(){const el=document.getElementById('pgTaskCal');const mos=['January','February','March','April','May','June','July','August','September','October','November','December'];const dys=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];const todayStr=getLocalDateStr();
 const fd=new Date(tcalYr,tcalMo,1).getDay(),dim=new Date(tcalYr,tcalMo+1,0).getDate(),pd=new Date(tcalYr,tcalMo,0).getDate(),today=new Date();
 let cdh='',dc=1,nc=1;const tc=Math.ceil((fd+dim)/7)*7;
 for(let i=0;i<tc;i++){let dn,oth=false,ds='';if(i<fd){dn=pd-fd+i+1;oth=true;const pm=tcalMo===0?11:tcalMo-1,py=tcalMo===0?tcalYr-1:tcalYr;ds=`${py}-${String(pm+1).padStart(2,'0')}-${String(dn).padStart(2,'0')}`}else if(dc>dim){dn=nc++;oth=true;const nm=tcalMo===11?0:tcalMo+1,ny=tcalMo===11?tcalYr+1:tcalYr;ds=`${ny}-${String(nm+1).padStart(2,'0')}-${String(dn).padStart(2,'0')}`}else{dn=dc++;ds=`${tcalYr}-${String(tcalMo+1).padStart(2,'0')}-${String(dn).padStart(2,'0')}`}
