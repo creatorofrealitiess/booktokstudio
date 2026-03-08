@@ -69,17 +69,20 @@ Output Structure:
 2. The Caption: Format EXACTLY like this with line breaks (NOT slashes):
 [Short emotional reaction, max 5-6 words]
 📚 : [Title In Title Case] by [Author Name]
-[tropes in lowercase separated by periods]
+[tropes in lowercase, each on its own line prefixed with —]
 
 Example caption:
 The way he chose her over everything
 📚 : Twisted Love by Ana Huang
-dark romance. possessive hero. brother's best friend. enemies to lovers.
+— dark romance
+— possessive hero
+— brother's best friend
+— enemies to lovers
 
 CAPTION RULES:
 - First line: emotional reaction, NO emoji
 - Second line: 📚 : then book title in Title Case (NOT ALL CAPS), then by Author
-- Third line: tropes in lowercase separated by periods, end each with a period
+- Tropes: each on its own line, prefixed with — (em dash), lowercase
 - Use line breaks between each line, NOT slashes
 
 3. The Context: 2-4 sentences about the scene.
@@ -240,17 +243,20 @@ Output Structure:
 2. The Caption: Format EXACTLY like this with line breaks (NOT slashes):
 [Short emotional reaction, max 5-6 words]
 📚 : [Title In Title Case] by [Author Name]
-[tropes in lowercase separated by periods]
+[tropes in lowercase, each on its own line prefixed with —]
 
 Example caption:
 The way he chose her over everything
 📚 : Twisted Love by Ana Huang
-dark romance. possessive hero. brother's best friend. enemies to lovers.
+— dark romance
+— possessive hero
+— brother's best friend
+— enemies to lovers
 
 CAPTION RULES:
 - First line: emotional reaction, NO emoji
 - Second line: 📚 : then book title in Title Case (NOT ALL CAPS), then by Author
-- Third line: tropes in lowercase separated by periods, end each with a period
+- Tropes: each on its own line, prefixed with — (em dash), lowercase
 - Use line breaks between each line, NOT slashes
 
 3. The Context: 2-4 sentences about the scene.
@@ -849,6 +855,8 @@ function BookTokApp(){
   const[wizardStep,setWizardStep]=useState(1); // 1=API keys, 2=Select book, 3=Select vibe
   const[apiKey,setApiKey]=useState("");
   const[anthropicKey,setAnthropicKey]=useState("");
+  const[claudeModel,setClaudeModel]=useState("claude-sonnet-4-6");
+  const CLAUDE_MODELS = [{id:"claude-sonnet-4-6",label:"Sonnet 4.6"},{id:"claude-opus-4-6",label:"Opus 4.6"}];
   const[model,setModel]=useState("gemini-3-flash-preview");
   const[pdfFile,setPdfFile]=useState(null);
   const[pdfText,setPdfText]=useState("");
@@ -1072,8 +1080,8 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
         const bm=scene.caption.match(/\uD83D\uDCDA\s*:?\s*(.+?)(?:\n|$)/);if(bm)setAuthor(bm[1].trim());else if(selectedBook)setAuthor(`${selectedBook.title} by ${selectedBook.author}`);
 
         // Step 2: Sonnet formats into tuples
-        setLoadingStatus("Opus: Formatting tuples...");
-        const sonRes=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-opus-4-6",max_tokens:4096,messages:[{role:"user",content:`${SONNET_TUPLE_PROMPT}\n\nHere is the excerpt to format:\n\n${scene.excerpt}`}]})});
+        setLoadingStatus("Claude: Formatting tuples...");
+        const sonRes=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:claudeModel,max_tokens:4096,messages:[{role:"user",content:`${SONNET_TUPLE_PROMPT}\n\nHere is the excerpt to format:\n\n${scene.excerpt}`}]})});
         if(!sonRes.ok){const e=await sonRes.json().catch(()=>({}));throw new Error("Sonnet: "+(e?.error?.message||`API ${sonRes.status}`))}
         const sonData=await sonRes.json();const sonText=sonData?.content?.[0]?.text;if(!sonText)throw new Error("Sonnet returned empty response");
         const cleanTuple=sonText.trim().replace(/^```(?:python)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
@@ -1095,7 +1103,7 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
         if(fixedTuple)setTimeout(()=>autoRender(fixedTuple),300);
       }catch(e){setError("Gemini error: "+e.message);setLoading(false);setLoadingStatus("")}
     }
-  },[apiKey,anthropicKey,model,pdfText,selectedVibe,customVibe,selectedBook,useHybrid]);
+  },[apiKey,anthropicKey,claudeModel,model,pdfText,selectedVibe,customVibe,selectedBook,useHybrid]);
 
   const autoRender=useCallback((raw)=>{const entries=parseTupleData(raw||tupleRaw);if(!entries.length)return;document.fonts.load(`500 ${fontSize}px "${fontName}"`).then(()=>{if(canvasRef.current){renderKindle(canvasRef.current,buildGroups(entries),2,fontName,fontSize);setRendered(true)}})},[tupleRaw,fontName,fontSize]);
   const doRender=useCallback(()=>{const entries=parseTupleData(tupleRaw);if(!entries.length){setError("No valid tuple data.");return}document.fonts.load(`500 ${fontSize}px "${fontName}"`).then(()=>{renderKindle(canvasRef.current,buildGroups(entries),2,fontName,fontSize);setRendered(true)})},[tupleRaw,fontName,fontSize]);
@@ -1154,43 +1162,56 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
     if(!excerptText&&!context&&!hook){setHookForgeError("Generate an excerpt first.");return}
     setHookForgeLoading(true);setHookForgeError("");setHookVariants([]);setHookForgeOpen(true);
     try{
-      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-opus-4-6",max_tokens:2048,messages:[{role:"user",content:`You are a BookTok hook specialist for romance slideshows. Your hooks go on the FIRST SLIDE of a TikTok slideshow — overlaid on a romantic/aesthetic photo.
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:claudeModel,max_tokens:2048,messages:[{role:"user",content:`You are a BookTok hook specialist for romance slideshows. You deeply understand romance BookTok — the tropes, the emotional triggers, what makes readers stop scrolling. Your hooks go on the FIRST SLIDE of a TikTok slideshow overlaid on a romantic/aesthetic photo.
 
-The user has a book scene with this context:
+CONTEXT FOR THIS SCENE:
 - Current hook: ${hook}
 - Scene context: ${context}
 - Excerpt: ${excerptText.substring(0,800)}
 
-Generate EXACTLY 7 hook variants. Each hook must:
-- End with an em dash — (to create curiosity/cliffhanger)
-- Use third person ("she", "he", "they") — NOT second person ("you")
-- Be designed to make someone STOP scrolling and SWIPE to read the excerpt
+Generate EXACTLY 7 hook variants. EVERY hook must end with an em dash —
 
-THE 7 VARIANTS (generate exactly these types):
+WHAT MAKES A HOOK VIRAL ON ROMANCE BOOKTOK:
+- It triggers an EMOTION in under 3 seconds (longing, heartbreak, butterflies, rage, possessiveness)
+- It names a trope readers already fantasize about (enemies to lovers, arranged marriage, grumpy x sunshine)
+- It creates a curiosity gap so painful the reader HAS to swipe
+- It uses language romance readers actually use: "obsessed," "unhinged," "down bad," "broke me," "wrecked"
+- Short hooks that name a FEELING outperform long hooks that explain plot
+- The best hooks make the reader feel something BEFORE they even read the excerpt
 
-1. SHORT EMOTIONAL (8-12 words max). Name the TROPE or FEELING, don't narrate plot. Examples: "When the enemies are starting to become lovers—", "When the mafia don finally breaks—", "It's enemies to lovers and he can't breathe—"
+HOOKS THAT HAVE GONE VIRAL (study these patterns):
+- "When the enemies are starting to become lovers—" (112K views — pure trope naming, 8 words)
+- "It's enemies to lovers and he's getting jealous—" (5.8K views — trope + specific emotion)
+- "She overhears him saying that she's 'just some girl' and decides to end their fake relationship thinking he won't care but this is his reaction—" (6.7K likes — devastating curiosity gap)
+- "He doesn't deny being a monster. He just promises to be *her* monster—" (strong male POV)
+- "When it's arranged marriage between exes and she expects him to sleep on the sofa but he—" (2.4K views — setup with cliffhanger)
+- "Her room is too cold to sleep in so she has to begrudgingly ask her arranged husband, the dragon king, for a better room but then he—" (3.1K views — specific scenario)
 
-2. SHORT EMOTIONAL ALT (8-12 words). Different angle, same short format. Go for a different emotion than #1.
+THE 7 VARIANTS:
 
-3. CURIOSITY GAP (15-25 words). Set up a specific scenario that creates devastating curiosity. Examples: "She overhears him saying she's 'just some girl' and decides to end their fake relationship thinking he won't care but this is his reaction—", "She tells her arranged mafia husband she hates him but then it gets revealed that—"
+1. SHORT EMOTIONAL (8-12 words MAXIMUM. Count them.). Name the trope or feeling. Do NOT narrate plot. This should read like a sigh, a gut punch, a flutter. Examples: "When the enemies are starting to become lovers—", "It's forced proximity and neither of them can sleep—", "When the ruthless one goes soft for her—"
 
-4. CURIOSITY GAP ALT (15-25 words). Different moment or angle from the same scene.
+2. SHORT EMOTIONAL ALT (8-12 words MAXIMUM). Different emotion or trope angle than #1. Make the reader FEEL something different.
 
-5. FEMALE POV (10-20 words). Write a hook showing HER side of the dynamic — what she is doing, feeling, or experiencing. Examples: "She can't breathe when he looks at her like that—", "She's staying up late studying when he shows up at her door—", "She tells herself she hates him but her voice breaks when—"
+3. CURIOSITY GAP (15-25 words). Build a specific scenario from this scene that creates unbearable curiosity. The reader must NEED to know what happens. Use details from the actual excerpt — character actions, dialogue setups, specific moments. End right before the payoff.
 
-6. MALE POV (10-20 words). Write a hook showing HIS side of the dynamic — a COMPLEMENTARY moment that pairs with the Female POV. NOT the same moment retold — a DIFFERENT action or feeling that together with #5 paints the full picture. Think: she does X, he does Y, and together they show the tension. Examples: "She's staying up late to study—" paired with "Him ditching the party to go find her—", or "She swears she doesn't care—" paired with "Him memorizing every detail about her like his life depends on it—"
+4. CURIOSITY GAP ALT (15-25 words). Different angle or moment from the scene. Make it emotionally devastating in a different way than #3.
 
-7. TROPE STACKER (10-15 words). Lead with the tropes stacked together. Example: "It's arranged marriage, enemies to lovers, and he just called her 'my wife'—", "Forced proximity + grumpy sunshine + he can't stop staring—"
+5. FEMALE POV (10-20 words). Show HER side — what she's doing, feeling, choosing. Make it feel like we're inside her head or watching her make a move.
 
-CRITICAL RULES:
-- Every hook MUST end with an em dash —
-- NO book titles, NO author names in the hooks
-- Short hooks should be FEELINGS not plot summaries
-- Curiosity gap hooks should make the reader NEED to swipe
-- Female POV and Male POV should be COMPLEMENTARY actions/feelings — together they paint the full dynamic, like two slides in a set
-- Be specific to THIS scene, not generic
+6. MALE POV (10-20 words). Show HIS side — a COMPLEMENTARY moment. She does X, he does Y. Together they tell the story of the tension. NOT the same moment, a different action that shows HIS side of the dynamic.
 
-Respond with ONLY a JSON array of objects. No markdown, no backticks, no explanation.
+7. TROPE STACKER (10-15 words). Stack 2-3 tropes with plus signs or commas, then add a specific detail. Examples: "It's arranged marriage + enemies to lovers and he just said 'my wife'—", "Forced proximity + one bed + he won't stop staring at her—"
+
+HARD RULES:
+- Every hook MUST end with — (em dash)
+- NO book titles or author names
+- Use third person (she/he/they), NOT second person (you)
+- SHORT EMOTIONAL hooks must be 8-12 words. If it's over 12 words, it's TOO LONG. Rewrite shorter.
+- Be SPECIFIC to this excerpt. Use details from the actual scene — not generic romance filler.
+- Make every word earn its place. Cut filler words ruthlessly.
+
+Respond with ONLY a JSON array. No markdown, no backticks, no explanation.
 [{"type":"short_emotional","hook":"..."},{"type":"short_emotional_alt","hook":"..."},{"type":"curiosity_gap","hook":"..."},{"type":"curiosity_gap_alt","hook":"..."},{"type":"female_pov","hook":"..."},{"type":"male_pov","hook":"..."},{"type":"trope_stack","hook":"..."}]`}]})});
       if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e?.error?.message||`API ${res.status}`)}
       const data=await res.json();const txt=(data?.content?.[0]?.text||"").trim();
@@ -1201,7 +1222,7 @@ Respond with ONLY a JSON array of objects. No markdown, no backticks, no explana
       else throw new Error("Unexpected response format");
     }catch(e){setHookForgeError("Hook Forge failed: "+e.message)}
     setHookForgeLoading(false);
-  },[anthropicKey,hook,context,tupleRaw]);
+  },[anthropicKey,claudeModel,hook,context,tupleRaw]);
 
   // === CAPTION BUILDER: Auto-detect tropes and build caption ===
   const detectTropesAndBuildCaption=useCallback(async()=>{
@@ -1210,7 +1231,7 @@ Respond with ONLY a JSON array of objects. No markdown, no backticks, no explana
     if(!excerptText&&!context)return;
     setCaptionGenLoading(true);
     try{
-      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-opus-4-6",max_tokens:1024,messages:[{role:"user",content:`Analyze this romance book excerpt and identify the tropes present.
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:claudeModel,max_tokens:1024,messages:[{role:"user",content:`Analyze this romance book excerpt and identify the tropes present.
 
 Scene context: ${context}
 Current hook: ${hook}
@@ -1219,7 +1240,7 @@ Excerpt: ${excerptText.substring(0,600)}
 Return ONLY a JSON object with:
 1. "tropes" - array of trope strings in lowercase (e.g. "enemies to lovers", "arranged marriage", "forced proximity", "mafia romance", "he falls first", "grumpy x sunshine", "stalker romance", "hockey romance", "fake dating", "brother's best friend", "dark romance", "possessive hero", "touch her and die", "bratva romance", "dragon shifter", "fantasy romance", "second chance", "forbidden love", etc.)
 2. "reaction" - a short emotional reaction line (3-6 words, no emoji, for the caption first line). Make it feel like a real reader's gut reaction. Examples: "The way he chose her", "I am not okay right now", "He really said that to her", "This man will be the death of me", "The yearning is killing me"
-3. "pinterest_searches" - array of 3-4 Pinterest search strings that would find good background images for this scene's mood (e.g. "dark couple aesthetic cinematic", "man holding woman possessive", "ice rink couple hockey", "fantasy castle couple dramatic")
+3. "pinterest_searches" - array of 3-4 Pinterest search strings that would find COUPLE PHOTOS or CHARACTER PHOTOS suitable as a TikTok slideshow background. These should find real photos of people, not illustrations or abstract art. Think about what you'd actually search on Pinterest to find a photo of a couple or person that matches this scene. Examples: "couple almost kissing dark aesthetic", "man in suit looking intense", "couple arguing hallway cinematic", "hockey player back view ice rink", "man carrying woman bridal style", "couple forehead touch intimate", "woman walking away man reaching for her". Be SPECIFIC about the pose, setting, and mood — not abstract mood words.
 
 No markdown, no backticks.
 {"tropes":["..."],"reaction":"...","pinterest_searches":["..."]}`}]})});
@@ -1231,7 +1252,7 @@ No markdown, no backticks.
       // Auto-build caption if we have the data
       if(result.reaction&&result.tropes){
         const bookLine=author||"[Book Title] by [Author]";
-        const tropeStr=result.tropes.map(t=>t.endsWith('.')?t:t+'.').join(' ');
+        const tropeStr=result.tropes.map(t=>'— '+t).join('\n');
         const newCaption=mysteryMode
           ?`${result.reaction}\n${tropeStr}`
           :`${result.reaction}\n📚 : ${bookLine}\n${tropeStr}`;
@@ -1245,7 +1266,7 @@ No markdown, no backticks.
       }
     }catch(e){console.error("Caption builder error:",e)}
     setCaptionGenLoading(false);
-  },[anthropicKey,hook,context,tupleRaw,author,mysteryMode]);
+  },[anthropicKey,claudeModel,hook,context,tupleRaw,author,mysteryMode]);
 
   // Rebuild caption when mystery mode toggles
   useEffect(()=>{
@@ -1276,7 +1297,6 @@ No markdown, no backticks.
       <div style={{borderBottom:"1px solid #e8e6e1",padding:"12px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"#fff"}}>
         <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
           <span style={{fontFamily:"'Fraunces',serif",fontSize:"18px",fontWeight:700,color:"#1a1815",letterSpacing:"-0.3px"}}>Post<span style={{color:"#e85d3a"}}>Maker</span></span>
-          <span style={{fontSize:"10px",color:"#a09a93",fontWeight:400}}>BookTok Post Generator</span>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
           {step==="results"&&<button onClick={resetAll} style={{...ST.btn,backgroundColor:"transparent",color:"#6b6660",border:"1px solid #e8e6e1",fontSize:"11px",padding:"6px 14px",borderRadius:"20px"}}>← New Book</button>}
@@ -1341,13 +1361,19 @@ No markdown, no backticks.
                     {GEMINI_MODELS.map(m=><option key={m.id} value={m.id}>{m.label}</option>)}
                   </select>
                 </div>
+                {anthropicKey.trim()&&(<div>
+                  <label style={ST.label}>Claude Model <span style={{textTransform:"none",color:"#c4bfb8"}}>(hooks, captions, tuples)</span></label>
+                  <select value={claudeModel} onChange={e=>setClaudeModel(e.target.value)} style={{...ST.input,cursor:"pointer",appearance:"auto",fontFamily:"'DM Sans', sans-serif",fontSize:"13px"}}>
+                    {CLAUDE_MODELS.map(m=><option key={m.id} value={m.id}>{m.label}</option>)}
+                  </select>
+                </div>)}
               </div>
 
               {/* Mode indicator */}
               <div style={{marginBottom:"24px",padding:"10px 14px",borderRadius:"8px",backgroundColor:anthropicKey.trim()?"#edf7f1":"#faf9f7",border:`1px solid ${anthropicKey.trim()?"#c3e6cb":"#e8e6e1"}`,display:"flex",alignItems:"center",gap:"10px"}}>
                 <div style={{width:"8px",height:"8px",borderRadius:"50%",backgroundColor:anthropicKey.trim()?"#2da562":"#c4bfb8"}} />
                 <span style={{fontSize:"11px",color:anthropicKey.trim()?"#2da562":"#a09a93"}}>
-                  {anthropicKey.trim()?"Hybrid Mode: Gemini finds scenes → Opus formats tuples":"Gemini-Only Mode: add Anthropic key to enable hybrid pipeline"}
+                  {anthropicKey.trim()?"Hybrid Mode: Gemini finds scenes → Claude formats tuples":"Gemini-Only Mode: add Anthropic key to enable hybrid pipeline"}
                 </span>
               </div>
 
@@ -1579,7 +1605,7 @@ No markdown, no backticks.
                 <CopyBtn field="caption" text={caption} />
               </div>
               {mysteryMode&&<div style={{fontSize:"10px",color:"#da7e9e",fontFamily:"'DM Sans', sans-serif",marginBottom:"6px",padding:"4px 8px",backgroundColor:"#fdf0f6",borderRadius:"4px",border:"1px solid #f0c0d8"}}>Mystery mode: book title hidden. Drop it in the comments to drive engagement.</div>}
-              <textarea value={caption} onChange={e=>setCaption(e.target.value)} style={{...ST.input,height:"110px",resize:"vertical",fontSize:"12px",lineHeight:"1.6"}} />
+              <textarea value={caption} onChange={e=>setCaption(e.target.value)} style={{...ST.input,height:"160px",resize:"vertical",fontSize:"12px",lineHeight:"1.6"}} />
               {detectedTropes.length>0&&(
                 <div style={{marginTop:"8px"}}>
                   <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
