@@ -3,15 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BookTok Studio</title>
+  <title>Post Maker — BookTok Post Generator</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600;8..144,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0b0b0b; color: #ddd; font-family: 'Roboto Flex', sans-serif; }
+    body { background: #f6f5f1; color: #1a1815; font-family: 'DM Sans', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+    ::selection { background: rgba(232,93,58,0.15); }
   </style>
 </head>
 <body>
@@ -34,15 +39,15 @@ const COLOR_MAP = {
   male_italic_underline: "#B5CDFD", female_italic_underline: "#FEC2D3", internal_italic_underline: "#FFF8B3", other_italic_underline: "#FDD9B0", narrative_italic_underline: null,
 };
 const VIBES = ["Bantering & Sexual Tension","Angst","Possessive / Jealousy","Forced Proximity","Enemies to Lovers Turning Point","Soft Vulnerability","Dark & Obsessive","Touch Her and Die","He Falls First","Grumpy / Sunshine","Slow Burn Payoff","Forbidden"];
-const GEMINI_MODELS = [{id:"gemini-3-pro-preview",label:"Gemini 3 Pro"},{id:"gemini-3.1-pro-preview",label:"Gemini 3.1 Pro (newest)"},{id:"gemini-3-flash-preview",label:"Gemini 3 Flash"},{id:"gemini-2.5-flash",label:"Gemini 2.5 Flash"}];
+const GEMINI_MODELS = [{id:"gemini-3-pro-preview",label:"Gemini 3 Pro"},{id:"gemini-3.1-pro-preview",label:"Gemini 3.1 Pro (newest)"},{id:"gemini-3-flash-preview",label:"Gemini 3 Flash"}];
 const FONT_OPTIONS = ["Lora","Literata","Gupter","Crimson Text","Source Serif 4","Merriweather","EB Garamond","DejaVu Serif"];
 const DEJAVU_CDN = "https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts@master/ttf/DejaVuSerif.ttf";
-const UI_FONT = "'Roboto Flex', sans-serif";
+const UI_FONT = "'DM Sans', -apple-system, sans-serif";
 
 const PROJECT_MAP = [
   { initials: "RE", authors: ["Veda Rose", "Lila Blair", "Zara Blaze", "Liv Raven"] },
-  { initials: "DK", authors: ["Lys Kane", "Lux Devon", "Lexi Asher"] },
-  { initials: "PV", authors: ["Zoya Carter", "Lara Hart", "Alessia Reid"] },
+  { initials: "DK", authors: ["Lys Kane", "Lexi Asher"] },
+  { initials: "PV", authors: ["Lara Hart"] },
 ];
 function getProject(authorField) {
   if (!authorField) return null;
@@ -830,10 +835,10 @@ function autoFixFlowTags(rawTuple) {
 async function extractPDFText(file){if(!window.pdfjsLib){const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';document.head.appendChild(s);await new Promise((r,j)=>{s.onload=r;s.onerror=j});window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'}const pdf=await window.pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;let t='';for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const tc=await pg.getTextContent();t+=tc.items.map(it=>it.str).join(' ')+'\n'}return t}
 
 const ST={
-  label:{display:"block",fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"#555",marginBottom:"5px",fontFamily:"'DM Mono', monospace"},
-  input:{width:"100%",padding:"10px 12px",backgroundColor:"#111",border:"1px solid #1f1f1f",borderRadius:"6px",color:"#ccc",fontSize:"13px",fontFamily:UI_FONT,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"},
-  btn:{padding:"10px 16px",border:"none",borderRadius:"6px",fontSize:"13px",fontWeight:600,cursor:"pointer",transition:"all 0.15s ease",fontFamily:UI_FONT},
-  card:{padding:"14px",backgroundColor:"#0f0f0f",borderRadius:"8px",border:"1px solid #1a1a1a"}
+  label:{display:"block",fontSize:"10px",textTransform:"uppercase",letterSpacing:"1.5px",color:"#a09a93",marginBottom:"5px",fontFamily:"'DM Sans', sans-serif",fontWeight:600},
+  input:{width:"100%",padding:"11px 14px",backgroundColor:"#fff",border:"1.5px solid #e8e6e1",borderRadius:"8px",color:"#1a1815",fontSize:"13px",fontFamily:UI_FONT,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s, box-shadow 0.2s"},
+  btn:{padding:"10px 16px",border:"none",borderRadius:"8px",fontSize:"13px",fontWeight:600,cursor:"pointer",transition:"all 0.15s ease",fontFamily:UI_FONT},
+  card:{padding:"16px",backgroundColor:"#fff",borderRadius:"12px",border:"1px solid #e8e6e1",boxShadow:"0 1px 2px rgba(26,24,21,0.04)"}
 };
 
 const DEFAULT_CAT = {id:"default",name:"General"};
@@ -841,9 +846,10 @@ const DEFAULT_CAT = {id:"default",name:"General"};
 function BookTokApp(){
   const[activeTab,setActiveTab]=useState("generate");
   const[step,setStep]=useState("upload");
+  const[wizardStep,setWizardStep]=useState(1); // 1=API keys, 2=Select book, 3=Select vibe
   const[apiKey,setApiKey]=useState("");
   const[anthropicKey,setAnthropicKey]=useState("");
-  const[model,setModel]=useState("gemini-2.5-flash");
+  const[model,setModel]=useState("gemini-3-flash-preview");
   const[pdfFile,setPdfFile]=useState(null);
   const[pdfText,setPdfText]=useState("");
   const[selectedVibe,setSelectedVibe]=useState("");
@@ -927,7 +933,7 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
 
   useEffect(()=>{document.querySelectorAll('link[data-kindle-font]').forEach(el=>el.remove());if(fontName==="DejaVu Serif"){new FontFace("DejaVu Serif",`url(${DEJAVU_CDN})`).load().then(f=>document.fonts.add(f)).catch(()=>{})}else if(fontName!==customFontName){const l=document.createElement('link');l.href=`https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g,'+')}:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap`;l.rel='stylesheet';l.setAttribute('data-kindle-font','true');document.head.appendChild(l)}},[fontName,customFontName]);
 
-  useEffect(()=>{const l=document.createElement('link');l.href='https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap';l.rel='stylesheet';document.head.appendChild(l)},[]);
+  useEffect(()=>{},[]);
 
   // === Book Library Handlers ===
   const handleNewBookPdf=useCallback(async(file)=>{
@@ -1066,14 +1072,14 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
         const bm=scene.caption.match(/\uD83D\uDCDA\s*:?\s*(.+?)(?:\n|$)/);if(bm)setAuthor(bm[1].trim());else if(selectedBook)setAuthor(`${selectedBook.title} by ${selectedBook.author}`);
 
         // Step 2: Sonnet formats into tuples
-        setLoadingStatus("Sonnet: Formatting tuples...");
-        const sonRes=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:4096,messages:[{role:"user",content:`${SONNET_TUPLE_PROMPT}\n\nHere is the excerpt to format:\n\n${scene.excerpt}`}]})});
+        setLoadingStatus("Opus: Formatting tuples...");
+        const sonRes=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-opus-4-6",max_tokens:4096,messages:[{role:"user",content:`${SONNET_TUPLE_PROMPT}\n\nHere is the excerpt to format:\n\n${scene.excerpt}`}]})});
         if(!sonRes.ok){const e=await sonRes.json().catch(()=>({}));throw new Error("Sonnet: "+(e?.error?.message||`API ${sonRes.status}`))}
         const sonData=await sonRes.json();const sonText=sonData?.content?.[0]?.text;if(!sonText)throw new Error("Sonnet returned empty response");
         const cleanTuple=sonText.trim().replace(/^```(?:python)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
         const fixedTuple=autoFixFlowTags(cleanTuple);
         setTupleRaw(fixedTuple);
-        setStep("results");setActiveTab("results");setLoading(false);setLoadingStatus("");
+        setStep("results");setActiveTab("excerpt");setLoading(false);setLoadingStatus("");
         if(fixedTuple)setTimeout(()=>autoRender(fixedTuple),300);
       }catch(e){setError(e.message);setLoading(false);setLoadingStatus("")}
 
@@ -1085,7 +1091,7 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
         const data=await res.json();const text=data?.candidates?.[0]?.content?.parts?.[0]?.text;if(!text)throw new Error("Empty response");
         const parsed=parseGeminiResponse(text);const fixedTuple=parsed.tupleRaw?autoFixFlowTags(parsed.tupleRaw):parsed.tupleRaw;setHook(parsed.hook);setCaption(parsed.caption);setContext(parsed.context);setTupleRaw(fixedTuple);
         const bm=parsed.caption.match(/\uD83D\uDCDA\s*:?\s*(.+?)(?:\n|$)/);if(bm)setAuthor(bm[1].trim());else if(selectedBook)setAuthor(`${selectedBook.title} by ${selectedBook.author}`);
-        setStep("results");setActiveTab("results");setLoading(false);setLoadingStatus("");
+        setStep("results");setActiveTab("excerpt");setLoading(false);setLoadingStatus("");
         if(fixedTuple)setTimeout(()=>autoRender(fixedTuple),300);
       }catch(e){setError("Gemini error: "+e.message);setLoading(false);setLoadingStatus("")}
     }
@@ -1095,7 +1101,7 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
   const doRender=useCallback(()=>{const entries=parseTupleData(tupleRaw);if(!entries.length){setError("No valid tuple data.");return}document.fonts.load(`500 ${fontSize}px "${fontName}"`).then(()=>{renderKindle(canvasRef.current,buildGroups(entries),2,fontName,fontSize);setRendered(true)})},[tupleRaw,fontName,fontSize]);
   const doCopy=useCallback(async()=>{try{const blob=await new Promise(r=>canvasRef.current.toBlob(r,'image/png'));await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);setCopied(true);setTimeout(()=>setCopied(false),2000)}catch(e){console.error(e)}},[]);
   const copyField=useCallback(async(text,field)=>{try{await navigator.clipboard.writeText(text);setCopiedField(field);setTimeout(()=>setCopiedField(""),1500)}catch(e){console.error(e)}},[]);
-  const resetAll=useCallback(()=>{setStep("upload");setActiveTab("generate");setPdfFile(null);setPdfText("");setSelectedVibe("");setCustomVibe("");setHook("");setCaption("");setContext("");setTupleRaw("");setRendered(false);setAuthor("");setError("");setSelectedPhotos([]);setAiPickedPhotos([]);setSelectedBook(null);setChatMessages([]);setChatOpen(false);setHookVariants([]);setHookForgeOpen(false);setHookForgeError("");setDetectedTropes([]);setMysteryMode(false);window._pinterestSearches=null},[]);
+  const resetAll=useCallback(()=>{setStep("upload");setActiveTab("generate");setWizardStep(1);setPdfFile(null);setPdfText("");setSelectedVibe("");setCustomVibe("");setHook("");setCaption("");setContext("");setTupleRaw("");setRendered(false);setAuthor("");setError("");setSelectedPhotos([]);setAiPickedPhotos([]);setSelectedBook(null);setChatMessages([]);setChatOpen(false);setHookVariants([]);setHookForgeOpen(false);setHookForgeError("");setDetectedTropes([]);setMysteryMode(false);window._pinterestSearches=null},[]);
 
   // Auto-scroll chat to bottom
   useEffect(()=>{if(chatEndRef.current)chatEndRef.current.scrollIntoView({behavior:"smooth"})},[chatMessages,chatLoading]);
@@ -1148,7 +1154,7 @@ const baseName=fileArr[0].name.replace(/\.\w+$/,'').replace(/[_\-\s]*(bold[_\-\s
     if(!excerptText&&!context&&!hook){setHookForgeError("Generate an excerpt first.");return}
     setHookForgeLoading(true);setHookForgeError("");setHookVariants([]);setHookForgeOpen(true);
     try{
-      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:2048,messages:[{role:"user",content:`You are a BookTok hook specialist for romance slideshows. Your hooks go on the FIRST SLIDE of a TikTok slideshow — overlaid on a romantic/aesthetic photo.
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-opus-4-6",max_tokens:2048,messages:[{role:"user",content:`You are a BookTok hook specialist for romance slideshows. Your hooks go on the FIRST SLIDE of a TikTok slideshow — overlaid on a romantic/aesthetic photo.
 
 The user has a book scene with this context:
 - Current hook: ${hook}
@@ -1204,7 +1210,7 @@ Respond with ONLY a JSON array of objects. No markdown, no backticks, no explana
     if(!excerptText&&!context)return;
     setCaptionGenLoading(true);
     try{
-      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1024,messages:[{role:"user",content:`Analyze this romance book excerpt and identify the tropes present.
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":anthropicKey.trim(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-opus-4-6",max_tokens:1024,messages:[{role:"user",content:`Analyze this romance book excerpt and identify the tropes present.
 
 Scene context: ${context}
 Current hook: ${hook}
@@ -1259,268 +1265,281 @@ No markdown, no backticks.
     }
   },[mysteryMode]);
 
-  const tabStyle=(t)=>({padding:"8px 18px",fontSize:"12px",fontWeight:600,cursor:"pointer",border:"none",borderBottom:activeTab===t?"2px solid #fff":"2px solid transparent",backgroundColor:"transparent",color:activeTab===t?"#ddd":"#555",fontFamily:UI_FONT,transition:"all 0.15s",letterSpacing:"0.3px"});
-  const catTabStyle=(id)=>({padding:"6px 14px",fontSize:"12px",fontWeight:500,cursor:"pointer",border:"1px solid",borderColor:activeCatId===id?"#555":"#1a1a1a",borderRadius:"20px",backgroundColor:activeCatId===id?"#1e1e1e":"transparent",color:activeCatId===id?"#ddd":"#555",fontFamily:UI_FONT,transition:"all 0.15s",whiteSpace:"nowrap"});
-  const CopyBtn=({field,text})=>(<button onClick={()=>copyField(text,field)} style={{...ST.btn,padding:"3px 10px",fontSize:"10px",backgroundColor:"transparent",color:copiedField===field?"#5cb85c":"#555",border:`1px solid ${copiedField===field?"#2a5a2a":"#222"}`}}>{copiedField===field?"✓ Copied":"Copy"}</button>);
+  const tabStyle=(t)=>({padding:"8px 18px",fontSize:"12px",fontWeight:600,cursor:"pointer",border:"none",borderBottom:activeTab===t?"2px solid #e85d3a":"2px solid transparent",backgroundColor:"transparent",color:activeTab===t?"#1a1815":"#a09a93",fontFamily:UI_FONT,transition:"all 0.15s",letterSpacing:"0.3px"});
+  const catTabStyle=(id)=>({padding:"6px 14px",fontSize:"12px",fontWeight:500,cursor:"pointer",border:"1px solid",borderColor:activeCatId===id?"#e85d3a":"#e8e6e1",borderRadius:"20px",backgroundColor:activeCatId===id?"#fef0ec":"transparent",color:activeCatId===id?"#e85d3a":"#a09a93",fontFamily:UI_FONT,transition:"all 0.15s",whiteSpace:"nowrap"});
+  const CopyBtn=({field,text})=>(<button onClick={()=>copyField(text,field)} style={{...ST.btn,padding:"3px 10px",fontSize:"10px",backgroundColor:"transparent",color:copiedField===field?"#2da562":"#a09a93",border:`1px solid ${copiedField===field?"#c3e6cb":"#e8e6e1"}`,borderRadius:"6px"}}>{copiedField===field?"✓ Copied":"Copy"}</button>);
 
   return (
-    <div style={{minHeight:"100vh",backgroundColor:"#0b0b0b",color:"#ddd",fontFamily:UI_FONT}}>
+    <div style={{minHeight:"100vh",backgroundColor:"#f6f5f1",color:"#1a1815",fontFamily:UI_FONT}}>
 
       {/* Header */}
-      <div style={{borderBottom:"1px solid #161616",padding:"12px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"linear-gradient(180deg,#0f0f0f 0%,#0b0b0b 100%)"}}>
-        <div style={{display:"flex",alignItems:"center",gap:"12px"}}>
-          <span style={{fontSize:"20px"}}>📖</span>
-          <span style={{fontSize:"16px",fontWeight:700,letterSpacing:"-0.3px"}}>BookTok Studio</span>
-          <span style={{fontSize:"9px",padding:"2px 7px",borderRadius:"3px",backgroundColor:"#1a1a1a",color:"#555",fontFamily:"'DM Mono',monospace",border:"1px solid #222",letterSpacing:"0.5px"}}>v6.0</span>
+      <div style={{borderBottom:"1px solid #e8e6e1",padding:"12px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"#fff"}}>
+        <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
+          <span style={{fontFamily:"'Fraunces',serif",fontSize:"18px",fontWeight:700,color:"#1a1815",letterSpacing:"-0.3px"}}>Post<span style={{color:"#e85d3a"}}>Maker</span></span>
+          <span style={{fontSize:"10px",color:"#a09a93",fontWeight:400}}>BookTok Post Generator</span>
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:"12px"}}>
-          {step==="results"&&<button onClick={resetAll} style={{...ST.btn,backgroundColor:"transparent",color:"#555",border:"1px solid #222",fontSize:"11px",padding:"6px 12px"}}>← New Book</button>}
-          {step!=="results"&&<button onClick={()=>{setStep("results");setActiveTab("results")}} style={{...ST.btn,backgroundColor:"transparent",color:"#333",border:"1px solid #1a1a1a",fontSize:"11px",padding:"6px 12px"}}>Skip to Results ↗</button>}
-          <span style={{fontSize:"10px",color:"#333",fontFamily:"'DM Mono',monospace"}}>gemini + claude powered</span>
+        <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
+          {step==="results"&&<button onClick={resetAll} style={{...ST.btn,backgroundColor:"transparent",color:"#6b6660",border:"1px solid #e8e6e1",fontSize:"11px",padding:"6px 14px",borderRadius:"20px"}}>← New Book</button>}
+          {step!=="results"&&<button onClick={()=>{setStep("results");setActiveTab("excerpt")}} style={{...ST.btn,backgroundColor:"transparent",color:"#a09a93",border:"1px solid #e8e6e1",fontSize:"11px",padding:"6px 14px",borderRadius:"20px"}}>Skip to Excerpt ↗</button>}
+          <span style={{fontSize:"10px",color:"#a09a93"}}>gemini + claude</span>
         </div>
       </div>
 
       {/* Nav */}
-      <div style={{borderBottom:"1px solid #161616",padding:"0 24px",display:"flex",gap:"4px"}}>
+      <div style={{borderBottom:"1px solid #e8e6e1",padding:"0 24px",display:"flex",gap:"4px",background:"#fff"}}>
         <button style={tabStyle("generate")} onClick={()=>setActiveTab("generate")}>Generate</button>
-        <button style={tabStyle("photos")} onClick={()=>setActiveTab("photos")}>
-          Photo Library{photos.length>0&&<span style={{marginLeft:"6px",fontSize:"9px",backgroundColor:"#1a1a1a",padding:"1px 6px",borderRadius:"8px",color:"#666"}}>{photos.length}</span>}
-        </button>
-        {step==="results"&&<button style={tabStyle("results")} onClick={()=>setActiveTab("results")}>Results</button>}
+
+        {step==="results"&&<button style={tabStyle("excerpt")} onClick={()=>setActiveTab("excerpt")}>Excerpt</button>}
+        {step==="results"&&<button style={tabStyle("post")} onClick={()=>setActiveTab("post")}>Post</button>}
       </div>
 
-      {/* GENERATE TAB */}
+      {/* GENERATE TAB — Stepped Wizard */}
       {activeTab==="generate"&&(
-        <div style={{maxWidth:"720px",margin:"0 auto",padding:"32px 24px"}}>
-          {/* API Keys & Model row */}
-          <div style={{display:"flex",gap:"14px",marginBottom:"12px"}}>
-            <div style={{flex:1}}>
-              <label style={ST.label}>Gemini API Key</label>
-              <input type="password" value={apiKey} onChange={e=>setApiKey(e.target.value)} placeholder="Paste your Gemini API key" style={{...ST.input,fontFamily:"'DM Mono',monospace",fontSize:"12px"}} />
-            </div>
-            <div style={{flex:1}}>
-              <label style={ST.label}>Anthropic API Key <span style={{textTransform:"none",color:"#333"}}>(optional — enables hybrid mode)</span></label>
-              <input type="password" value={anthropicKey} onChange={e=>setAnthropicKey(e.target.value)} placeholder="Paste your Anthropic API key" style={{...ST.input,fontFamily:"'DM Mono',monospace",fontSize:"12px"}} />
-            </div>
-            <div style={{width:"200px"}}>
-              <label style={ST.label}>Gemini Model</label>
-              <select value={model} onChange={e=>setModel(e.target.value)} style={{...ST.input,cursor:"pointer",appearance:"auto",fontFamily:"'DM Mono',monospace",fontSize:"12px"}}>
-                {GEMINI_MODELS.map(m=><option key={m.id} value={m.id}>{m.label}</option>)}
-              </select>
-            </div>
-          </div>
-          {/* Mode indicator */}
-          <div style={{marginBottom:"28px",padding:"8px 14px",borderRadius:"6px",backgroundColor:anthropicKey.trim()?"#0f1a0f":"#111",border:`1px solid ${anthropicKey.trim()?"#1a2e1a":"#1a1a1a"}`,display:"flex",alignItems:"center",gap:"10px"}}>
-            <div style={{width:"8px",height:"8px",borderRadius:"50%",backgroundColor:anthropicKey.trim()?"#5cb85c":"#555"}} />
-            <span style={{fontSize:"11px",color:anthropicKey.trim()?"#8b8":"#555",fontFamily:"'DM Mono',monospace"}}>
-              {anthropicKey.trim()?"Hybrid Mode: Gemini finds scenes → Sonnet formats tuples":"Gemini-Only Mode: add Anthropic key to enable hybrid pipeline"}
-            </span>
+        <div style={{maxWidth:"640px",margin:"0 auto",padding:"32px 24px"}}>
+
+          {/* Wizard Progress Bar */}
+          <div style={{display:"flex",alignItems:"center",gap:"0",marginBottom:"36px"}}>
+            {[{n:1,label:"Setup"},{n:2,label:"Book"},{n:3,label:"Vibe"}].map((s,i)=>{
+              const isActive=wizardStep===s.n;
+              const isDone=wizardStep>s.n;
+              const dotColor=isActive?"#e85d3a":isDone?"#2da562":"#e8e6e1";
+              const textColor=isActive?"#1a1815":isDone?"#2da562":"#c4bfb8";
+              return (
+                <React.Fragment key={s.n}>
+                  {i>0&&<div style={{flex:1,height:"2px",backgroundColor:isDone?"#2da562":"#e8e6e1",margin:"0 -2px",transition:"background-color 0.3s"}} />}
+                  <div onClick={()=>{if(isDone||isActive)setWizardStep(s.n)}} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"6px",cursor:isDone||isActive?"pointer":"default",zIndex:1}}>
+                    <div style={{width:"32px",height:"32px",borderRadius:"50%",backgroundColor:dotColor,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"13px",fontWeight:700,color:isActive?"#fff":isDone?"#fff":"#c4bfb8",transition:"all 0.3s",fontFamily:UI_FONT,border:isActive?"2px solid #e85d3a":isDone?"2px solid #2da562":"2px solid #e8e6e1"}}>
+                      {isDone?"✓":s.n}
+                    </div>
+                    <span style={{fontSize:"10px",fontWeight:600,letterSpacing:"0.5px",color:textColor,fontFamily:UI_FONT,transition:"color 0.3s",textTransform:"uppercase"}}>{s.label}</span>
+                  </div>
+                </React.Fragment>
+              );
+            })}
           </div>
 
-          {/* Book Library */}
-          <div style={{marginBottom:"28px"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"14px"}}>
-              <label style={{...ST.label,marginBottom:0}}>Select Book</label>
-              <button onClick={()=>{setAddingBook(!addingBook);setError("");setNewBookTitle("");setNewBookAuthor("");setNewBookPdfText("");setNewBookPdfName("")}} style={{...ST.btn,padding:"5px 12px",fontSize:"10px",backgroundColor:addingBook?"#1a1a1a":"transparent",color:addingBook?"#ddd":"#555",border:"1px solid #222"}}>{addingBook?"Cancel":"+ Add Book"}</button>
-            </div>
+          {/* STEP 1: API Keys & Model */}
+          {wizardStep===1&&(
+            <div style={{animation:"fadeIn 0.25s ease"}}>
+              <div style={{marginBottom:"24px"}}>
+                <h3 style={{fontFamily:"'Fraunces',serif",fontSize:"20px",fontWeight:700,color:"#1a1815",marginBottom:"4px"}}>Connect your AI</h3>
+                <p style={{fontSize:"12px",color:"#a09a93",fontFamily:UI_FONT}}>Add your API keys to power the excerpt generator.</p>
+              </div>
 
-            {/* Add Book Form — PDF first, then auto-filled fields */}
-            {addingBook&&(
-              <div style={{...ST.card,marginBottom:"14px",display:"flex",flexDirection:"column",gap:"10px"}}>
+              <div style={{...ST.card,display:"flex",flexDirection:"column",gap:"16px",marginBottom:"16px"}}>
                 <div>
-                  <label style={ST.label}>Upload PDF <span style={{textTransform:"none",color:"#444"}}>(auto-detects title & author from filename)</span></label>
-                  <input ref={newBookPdfRef} type="file" accept=".pdf" style={{display:"none"}} onChange={e=>handleNewBookPdf(e.target.files[0])} />
-                  <div onClick={()=>newBookPdfRef.current?.click()} onDragOver={e=>{e.preventDefault();e.currentTarget.style.borderColor='#333'}} onDragLeave={e=>{e.currentTarget.style.borderColor='#1f1f1f'}} onDrop={e=>{e.preventDefault();e.currentTarget.style.borderColor='#1f1f1f';handleNewBookPdf(e.dataTransfer.files[0])}} style={{...ST.card,cursor:"pointer",textAlign:"center",padding:"20px",border:"1px dashed #1f1f1f",transition:"border-color 0.2s"}}>
-                    {newBookExtracting?(<div style={{color:"#888",fontSize:"12px"}}>Extracting text from {newBookPdfName}...</div>):newBookPdfText?(<div><span style={{color:"#8b8",fontSize:"12px"}}>✓ {newBookPdfName}</span><span style={{color:"#333",fontSize:"11px",marginLeft:"8px",fontFamily:"'DM Mono',monospace"}}>{(newBookPdfText.length/1000).toFixed(0)}k chars</span></div>):(<div style={{color:"#444",fontSize:"12px"}}>Drop PDF here or click to browse</div>)}
-                  </div>
+                  <label style={ST.label}>Gemini API Key</label>
+                  <input type="password" value={apiKey} onChange={e=>setApiKey(e.target.value)} placeholder="Paste your Gemini API key" style={{...ST.input,fontFamily:"'DM Sans', sans-serif",fontSize:"13px"}} />
                 </div>
-                {(newBookPdfText||newBookTitle)&&(
-                  <div style={{display:"flex",gap:"10px"}}>
-                    <div style={{flex:1}}><label style={ST.label}>Book Title</label><input value={newBookTitle} onChange={e=>setNewBookTitle(e.target.value)} placeholder="e.g. Dark Billionaire Stalker" style={{...ST.input,fontSize:"12px"}} /></div>
-                    <div style={{flex:1}}><label style={ST.label}>Author</label><input value={newBookAuthor} onChange={e=>{setNewBookAuthor(e.target.value);const proj=PROJECT_MAP.find(pr=>pr.authors.some(a=>e.target.value.toLowerCase().includes(a.toLowerCase())));if(proj)setNewBookProject(proj.initials)}} placeholder="e.g. Lara Hart" style={{...ST.input,fontSize:"12px"}} /></div>
-                  </div>
-                )}
-                {(newBookPdfText||newBookTitle)&&(
-                  <div style={{display:"flex",gap:"10px",alignItems:"flex-end"}}>
+                <div>
+                  <label style={ST.label}>Anthropic API Key <span style={{textTransform:"none",color:"#c4bfb8"}}>(optional — enables hybrid mode)</span></label>
+                  <input type="password" value={anthropicKey} onChange={e=>setAnthropicKey(e.target.value)} placeholder="Paste your Anthropic API key" style={{...ST.input,fontFamily:"'DM Sans', sans-serif",fontSize:"13px"}} />
+                </div>
+                <div>
+                  <label style={ST.label}>Gemini Model</label>
+                  <select value={model} onChange={e=>setModel(e.target.value)} style={{...ST.input,cursor:"pointer",appearance:"auto",fontFamily:"'DM Sans', sans-serif",fontSize:"13px"}}>
+                    {GEMINI_MODELS.map(m=><option key={m.id} value={m.id}>{m.label}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Mode indicator */}
+              <div style={{marginBottom:"24px",padding:"10px 14px",borderRadius:"8px",backgroundColor:anthropicKey.trim()?"#edf7f1":"#faf9f7",border:`1px solid ${anthropicKey.trim()?"#c3e6cb":"#e8e6e1"}`,display:"flex",alignItems:"center",gap:"10px"}}>
+                <div style={{width:"8px",height:"8px",borderRadius:"50%",backgroundColor:anthropicKey.trim()?"#2da562":"#c4bfb8"}} />
+                <span style={{fontSize:"11px",color:anthropicKey.trim()?"#2da562":"#a09a93"}}>
+                  {anthropicKey.trim()?"Hybrid Mode: Gemini finds scenes → Opus formats tuples":"Gemini-Only Mode: add Anthropic key to enable hybrid pipeline"}
+                </span>
+              </div>
+
+              <button onClick={()=>setWizardStep(2)} disabled={!apiKey.trim()} style={{...ST.btn,width:"100%",padding:"14px",backgroundColor:!apiKey.trim()?"#f0eeea":"#e85d3a",color:!apiKey.trim()?"#a09a93":"#fff",fontSize:"14px",borderRadius:"10px"}}>
+                Continue →
+              </button>
+            </div>
+          )}
+
+          {/* STEP 2: Select Book */}
+          {wizardStep===2&&(
+            <div style={{animation:"fadeIn 0.25s ease"}}>
+              <div style={{marginBottom:"24px"}}>
+                <h3 style={{fontFamily:"'Fraunces',serif",fontSize:"20px",fontWeight:700,color:"#1a1815",marginBottom:"4px"}}>Choose a book</h3>
+                <p style={{fontSize:"12px",color:"#a09a93",fontFamily:UI_FONT}}>Select from your library or add a new one.</p>
+              </div>
+
+              <div style={{marginBottom:"20px"}}>
+                <div style={{display:"flex",justifyContent:"flex-end",marginBottom:"14px"}}>
+                  <button onClick={()=>{setAddingBook(!addingBook);setError("");setNewBookTitle("");setNewBookAuthor("");setNewBookPdfText("");setNewBookPdfName("")}} style={{...ST.btn,padding:"5px 12px",fontSize:"10px",backgroundColor:addingBook?"#f0eeea":"transparent",color:addingBook?"#1a1815":"#a09a93",border:"1px solid #e8e6e1",borderRadius:"20px"}}>{addingBook?"Cancel":"+ Add Book"}</button>
+                </div>
+
+                {/* Add Book Form */}
+                {addingBook&&(
+                  <div style={{...ST.card,marginBottom:"14px",display:"flex",flexDirection:"column",gap:"10px"}}>
                     <div>
-                      <label style={ST.label}>Project</label>
-                      <div style={{display:"flex",gap:"6px"}}>
-                        {["RE","DK","PV"].map(p=>(<button key={p} onClick={()=>setNewBookProject(p)} style={{padding:"6px 14px",borderRadius:"4px",fontSize:"11px",fontWeight:600,fontFamily:"'DM Mono',monospace",border:"1px solid",cursor:"pointer",borderColor:newBookProject===p?(p==="RE"?"#4a2525":p==="DK"?"#25354a":"#254a25"):"#1a1a1a",backgroundColor:newBookProject===p?(p==="RE"?"#2a1515":p==="DK"?"#1f2a3d":"#152a15"):"transparent",color:newBookProject===p?(p==="RE"?"#f0a5a5":p==="DK"?"#a5c4f0":"#a5f0a5"):"#555"}}>{p}</button>))}
+                      <label style={ST.label}>Upload PDF <span style={{textTransform:"none",color:"#a09a93"}}>(auto-detects title & author from filename)</span></label>
+                      <input ref={newBookPdfRef} type="file" accept=".pdf" style={{display:"none"}} onChange={e=>handleNewBookPdf(e.target.files[0])} />
+                      <div onClick={()=>newBookPdfRef.current?.click()} onDragOver={e=>{e.preventDefault();e.currentTarget.style.borderColor='#e85d3a'}} onDragLeave={e=>{e.currentTarget.style.borderColor='#e8e6e1'}} onDrop={e=>{e.preventDefault();e.currentTarget.style.borderColor='#e8e6e1';handleNewBookPdf(e.dataTransfer.files[0])}} style={{...ST.card,cursor:"pointer",textAlign:"center",padding:"20px",border:"1px dashed #e8e6e1",transition:"border-color 0.2s"}}>
+                        {newBookExtracting?(<div style={{color:"#6b6660",fontSize:"12px"}}>Extracting text from {newBookPdfName}...</div>):newBookPdfText?(<div><span style={{color:"#2da562",fontSize:"12px"}}>✓ {newBookPdfName}</span><span style={{color:"#c4bfb8",fontSize:"11px",marginLeft:"8px",fontFamily:"'DM Sans', sans-serif"}}>{(newBookPdfText.length/1000).toFixed(0)}k chars</span></div>):(<div style={{color:"#a09a93",fontSize:"12px"}}>Drop PDF here or click to browse</div>)}
                       </div>
                     </div>
-                    <div style={{flex:1}} />
-                    <button onClick={addBook} disabled={!newBookTitle.trim()||!newBookAuthor.trim()||!newBookPdfText} style={{...ST.btn,padding:"10px 20px",backgroundColor:(!newBookTitle.trim()||!newBookAuthor.trim()||!newBookPdfText)?"#151515":"#fff",color:(!newBookTitle.trim()||!newBookAuthor.trim()||!newBookPdfText)?"#444":"#000",fontSize:"12px",whiteSpace:"nowrap"}}>Add to Library</button>
+                    {(newBookPdfText||newBookTitle)&&(
+                      <div style={{display:"flex",gap:"10px"}}>
+                        <div style={{flex:1}}><label style={ST.label}>Book Title</label><input value={newBookTitle} onChange={e=>setNewBookTitle(e.target.value)} placeholder="e.g. Dark Billionaire Stalker" style={{...ST.input,fontSize:"12px"}} /></div>
+                        <div style={{flex:1}}><label style={ST.label}>Author</label><input value={newBookAuthor} onChange={e=>{setNewBookAuthor(e.target.value);const proj=PROJECT_MAP.find(pr=>pr.authors.some(a=>e.target.value.toLowerCase().includes(a.toLowerCase())));if(proj)setNewBookProject(proj.initials)}} placeholder="e.g. Lara Hart" style={{...ST.input,fontSize:"12px"}} /></div>
+                      </div>
+                    )}
+                    {(newBookPdfText||newBookTitle)&&(
+                      <div style={{display:"flex",gap:"10px",alignItems:"flex-end"}}>
+                        <div>
+                          <label style={ST.label}>Project</label>
+                          <div style={{display:"flex",gap:"6px"}}>
+                            {["RE","DK","PV"].map(p=>(<button key={p} onClick={()=>setNewBookProject(p)} style={{padding:"6px 14px",borderRadius:"4px",fontSize:"11px",fontWeight:600,fontFamily:"'DM Sans', sans-serif",border:"1px solid",cursor:"pointer",borderColor:newBookProject===p?(p==="RE"?"#e85d3a":p==="DK"?"#6366f1":"#d946a8"):"#e8e6e1",backgroundColor:newBookProject===p?(p==="RE"?"#fef0ec":p==="DK"?"#eef0fe":"#fdf0fa"):"transparent",color:newBookProject===p?(p==="RE"?"#e85d3a":p==="DK"?"#6366f1":"#d946a8"):"#a09a93"}}>{p}</button>))}
+                          </div>
+                        </div>
+                        <div style={{flex:1}} />
+                        <button onClick={addBook} disabled={!newBookTitle.trim()||!newBookAuthor.trim()||!newBookPdfText} style={{...ST.btn,padding:"10px 20px",backgroundColor:(!newBookTitle.trim()||!newBookAuthor.trim()||!newBookPdfText)?"#f0eeea":"#e85d3a",color:(!newBookTitle.trim()||!newBookAuthor.trim()||!newBookPdfText)?"#a09a93":"#fff",fontSize:"12px",whiteSpace:"nowrap"}}>Add to Library</button>
+                      </div>
+                    )}
                   </div>
                 )}
+
+                {/* Book dropdowns by project */}
+                <div style={{display:"flex",flexDirection:"column",gap:"8px"}}>
+                  {["RE","DK","PV"].map(proj=>{
+                    const projBooks=books.filter(b=>b.project===proj);
+                    const projColor=proj==="RE"?"#e85d3a":proj==="DK"?"#6366f1":"#d946a8";
+                    const projBg=proj==="RE"?"#fef0ec":proj==="DK"?"#eef0fe":"#fdf0fa";
+                    const projBorder=proj==="RE"?"#e85d3a":proj==="DK"?"#6366f1":"#d946a8";
+                    const selId=selectedBook&&selectedBook.project===proj?selectedBook.id:"";
+                    return (
+                      <div key={proj} style={{display:"flex",alignItems:"center",gap:"10px"}}>
+                        <span style={{fontSize:"10px",fontWeight:700,letterSpacing:"1.5px",padding:"3px 8px",borderRadius:"3px",backgroundColor:projBg,color:projColor,fontFamily:"'DM Sans', sans-serif",border:`1px solid ${projBorder}`,minWidth:"32px",textAlign:"center"}}>{proj}</span>
+                        <select value={selId} onChange={e=>{const book=books.find(b=>b.id===e.target.value);if(book)selectBook(book);else if(!e.target.value){setSelectedBook(null);setPdfText("")}}} style={{...ST.input,flex:1,cursor:"pointer",appearance:"auto",fontSize:"12px",color:selId?"#1a1815":"#a09a93"}}>
+                          <option value="">— Select a book —</option>
+                          {projBooks.map(b=>(<option key={b.id} value={b.id}>{b.title} — {b.author}</option>))}
+                        </select>
+                        {selId&&<button onClick={()=>{if(confirm(`Delete "${selectedBook.title}"?`))deleteBook(selectedBook.id)}} title="Delete this book" style={{background:"none",border:"1px solid #e8e6e1",borderRadius:"4px",color:"#a09a93",cursor:"pointer",fontSize:"13px",padding:"6px 10px",lineHeight:1,transition:"all 0.15s"}} onMouseEnter={e=>{e.currentTarget.style.color='#dc3545';e.currentTarget.style.borderColor='#f5c6cb'}} onMouseLeave={e=>{e.currentTarget.style.color='#a09a93';e.currentTarget.style.borderColor='#e8e6e1'}}>×</button>}
+                      </div>
+                    );
+                  })}
+                </div>
+                {books.length===0&&!addingBook&&(
+                  <div style={{textAlign:"center",padding:"16px",color:"#c4bfb8",fontSize:"12px",fontFamily:"'DM Sans', sans-serif",marginTop:"8px"}}>Click "+ Add Book" to build your library</div>
+                )}
               </div>
-            )}
 
-            {/* Book dropdowns by project */}
-            <div style={{display:"flex",flexDirection:"column",gap:"8px"}}>
-              {["RE","DK","PV"].map(proj=>{
-                const projBooks=books.filter(b=>b.project===proj);
-                const projColor=proj==="RE"?"#f0a5a5":proj==="DK"?"#a5c4f0":"#a5f0a5";
-                const projBg=proj==="RE"?"#2a1515":proj==="DK"?"#1f2a3d":"#152a15";
-                const projBorder=proj==="RE"?"#4a2525":proj==="DK"?"#25354a":"#254a25";
-                const selId=selectedBook&&selectedBook.project===proj?selectedBook.id:"";
-                return (
-                  <div key={proj} style={{display:"flex",alignItems:"center",gap:"10px"}}>
-                    <span style={{fontSize:"10px",fontWeight:700,letterSpacing:"1.5px",padding:"3px 8px",borderRadius:"3px",backgroundColor:projBg,color:projColor,fontFamily:"'DM Mono',monospace",border:`1px solid ${projBorder}`,minWidth:"32px",textAlign:"center"}}>{proj}</span>
-                    <select value={selId} onChange={e=>{const book=books.find(b=>b.id===e.target.value);if(book)selectBook(book);else if(!e.target.value){setSelectedBook(null);setPdfText("")}}} style={{...ST.input,flex:1,cursor:"pointer",appearance:"auto",fontSize:"12px",color:selId?"#ddd":"#555"}}>
-                      <option value="">— Select a book —</option>
-                      {projBooks.map(b=>(<option key={b.id} value={b.id}>{b.title} — {b.author}</option>))}
-                    </select>
-                    {selId&&<button onClick={()=>{if(confirm(`Delete "${selectedBook.title}"?`))deleteBook(selectedBook.id)}} title="Delete this book" style={{background:"none",border:"1px solid #1a1a1a",borderRadius:"4px",color:"#444",cursor:"pointer",fontSize:"13px",padding:"6px 10px",lineHeight:1,transition:"all 0.15s"}} onMouseEnter={e=>{e.currentTarget.style.color='#e55';e.currentTarget.style.borderColor='#4a2525'}} onMouseLeave={e=>{e.currentTarget.style.color='#444';e.currentTarget.style.borderColor='#1a1a1a'}}>×</button>}
-                  </div>
-                );
-              })}
+              {error&&<div style={{padding:"10px 14px",backgroundColor:"#fef0ec",border:"1px solid #f5c6cb",borderRadius:"6px",color:"#dc3545",fontSize:"12px",marginBottom:"16px",fontFamily:"'DM Sans', sans-serif"}}>{error}</div>}
+
+              {/* Selected book confirmation */}
+              {selectedBook&&(
+                <div style={{padding:"12px 16px",backgroundColor:"#edf7f1",borderRadius:"8px",border:"1px solid #c3e6cb",marginBottom:"16px",display:"flex",alignItems:"center",gap:"10px"}}>
+                  <span style={{color:"#2da562",fontSize:"14px"}}>✓</span>
+                  <span style={{fontSize:"12px",color:"#2da562",fontFamily:UI_FONT,fontWeight:500}}>{selectedBook.title} by {selectedBook.author}</span>
+                </div>
+              )}
+
+              <div style={{display:"flex",gap:"10px"}}>
+                <button onClick={()=>setWizardStep(1)} style={{...ST.btn,padding:"14px 20px",backgroundColor:"transparent",color:"#a09a93",border:"1px solid #e8e6e1",fontSize:"13px",borderRadius:"10px"}}>← Back</button>
+                <button onClick={()=>setWizardStep(3)} disabled={!selectedBook||!pdfText} style={{...ST.btn,flex:1,padding:"14px",backgroundColor:!selectedBook||!pdfText?"#f0eeea":"#e85d3a",color:!selectedBook||!pdfText?"#a09a93":"#fff",fontSize:"14px",borderRadius:"10px"}}>
+                  Continue →
+                </button>
+              </div>
             </div>
-            {books.length===0&&!addingBook&&(
-              <div style={{textAlign:"center",padding:"16px",color:"#333",fontSize:"12px",fontFamily:"'DM Mono',monospace",marginTop:"8px"}}>Click "+ Add Book" to build your library</div>
-            )}
-          </div>
+          )}
 
-          {/* Vibe / Trope Selection */}
-          <div style={{marginBottom:"28px",opacity:selectedBook?1:0.4,pointerEvents:selectedBook?"auto":"none",transition:"opacity 0.2s"}}>
-            <label style={ST.label}>Select Vibe / Trope</label>
-            <div style={{display:"flex",flexWrap:"wrap",gap:"6px",marginBottom:"10px"}}>
-              {VIBES.map(v=>(<button key={v} onClick={()=>{setSelectedVibe(v);setCustomVibe("")}} style={{padding:"7px 13px",borderRadius:"20px",fontSize:"12px",border:selectedVibe===v?"1px solid #444":"1px solid #1a1a1a",backgroundColor:selectedVibe===v?"#1a1a1a":"#0f0f0f",color:selectedVibe===v?"#ddd":"#666",cursor:"pointer",transition:"all 0.15s",fontFamily:UI_FONT}}>{v}</button>))}
+          {/* STEP 3: Select Vibe & Generate */}
+          {wizardStep===3&&(
+            <div style={{animation:"fadeIn 0.25s ease"}}>
+              <div style={{marginBottom:"24px"}}>
+                <h3 style={{fontFamily:"'Fraunces',serif",fontSize:"20px",fontWeight:700,color:"#1a1815",marginBottom:"4px"}}>Pick a vibe</h3>
+                <p style={{fontSize:"12px",color:"#a09a93",fontFamily:UI_FONT}}>What kind of scene are you looking for in <strong style={{color:"#1a1815"}}>{selectedBook?.title||"this book"}</strong>?</p>
+              </div>
+
+              <div style={{marginBottom:"20px"}}>
+                <div style={{display:"flex",flexWrap:"wrap",gap:"6px",marginBottom:"12px"}}>
+                  {VIBES.map(v=>(<button key={v} onClick={()=>{setSelectedVibe(v);setCustomVibe("")}} style={{padding:"8px 14px",borderRadius:"20px",fontSize:"12px",border:selectedVibe===v?"1px solid #e85d3a":"1px solid #e8e6e1",backgroundColor:selectedVibe===v?"#fef0ec":"#fff",color:selectedVibe===v?"#e85d3a":"#6b6660",cursor:"pointer",transition:"all 0.15s",fontFamily:UI_FONT}}>{v}</button>))}
+                </div>
+                <input value={customVibe} onChange={e=>{setCustomVibe(e.target.value);if(e.target.value)setSelectedVibe("")}} placeholder="Or type a custom vibe..." style={{...ST.input,fontSize:"13px"}} />
+              </div>
+
+              {error&&<div style={{padding:"10px 14px",backgroundColor:"#fef0ec",border:"1px solid #f5c6cb",borderRadius:"6px",color:"#dc3545",fontSize:"12px",marginBottom:"16px",fontFamily:"'DM Sans', sans-serif"}}>{error}</div>}
+
+              <div style={{display:"flex",gap:"10px"}}>
+                <button onClick={()=>setWizardStep(2)} style={{...ST.btn,padding:"14px 20px",backgroundColor:"transparent",color:"#a09a93",border:"1px solid #e8e6e1",fontSize:"13px",borderRadius:"10px"}}>← Back</button>
+                <button onClick={callGemini} disabled={loading||(!selectedVibe&&!customVibe.trim())} style={{...ST.btn,flex:1,padding:"14px",backgroundColor:loading||(!selectedVibe&&!customVibe.trim())?"#f0eeea":"#e85d3a",color:loading||(!selectedVibe&&!customVibe.trim())?"#a09a93":"#fff",fontSize:"14px",borderRadius:"10px"}}>
+                  {loading?(<span style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px"}}><span style={{display:"inline-block",width:"14px",height:"14px",border:"2px solid rgba(255,255,255,0.3)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin 0.8s linear infinite"}} />{loadingStatus}</span>):(useHybrid?"Generate — Hybrid Mode":"Generate BookTok Assets")}
+                </button>
+              </div>
             </div>
-            <input value={customVibe} onChange={e=>{setCustomVibe(e.target.value);if(e.target.value)setSelectedVibe("")}} placeholder="Or type a custom vibe..." style={{...ST.input,fontSize:"12px"}} />
-          </div>
-
-          {error&&<div style={{padding:"10px 14px",backgroundColor:"#1a0f0f",border:"1px solid #331a1a",borderRadius:"6px",color:"#e55",fontSize:"12px",marginBottom:"16px",fontFamily:"'DM Mono',monospace"}}>{error}</div>}
-          <button onClick={callGemini} disabled={loading||!selectedBook||!pdfText||(!selectedVibe&&!customVibe.trim())} style={{...ST.btn,width:"100%",padding:"14px",backgroundColor:loading||!selectedBook||!pdfText||(!selectedVibe&&!customVibe.trim())?"#151515":"#fff",color:loading||!selectedBook||!pdfText||(!selectedVibe&&!customVibe.trim())?"#444":"#000",fontSize:"14px"}}>
-            {loading?(<span style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px"}}><span style={{display:"inline-block",width:"14px",height:"14px",border:"2px solid #333",borderTopColor:"#888",borderRadius:"50%",animation:"spin 0.8s linear infinite"}} />{loadingStatus}</span>):(useHybrid?"Generate — Hybrid Mode (Gemini + Sonnet)":"Generate BookTok Assets")}
-          </button>
+          )}
         </div>
       )}
 
       {/* PHOTO LIBRARY TAB */}
-      {activeTab==="photos"&&(
-        <div style={{maxWidth:"960px",margin:"0 auto",padding:"28px 24px"}}>
 
-          {/* Category Tab Bar */}
-          <div style={{marginBottom:"20px"}}>
-            <div style={{display:"flex",alignItems:"center",gap:"8px",flexWrap:"wrap",marginBottom:"14px"}}>
-              {[...categories].sort((a,b)=>a.id==="default"?-1:b.id==="default"?1:0).map(cat=>(
-                <div key={cat.id} style={{display:"flex",alignItems:"center",gap:"3px"}}>
-                  <button style={catTabStyle(cat.id)} onClick={()=>setActiveCatId(cat.id)}>{cat.name}</button>
-                  {cat.id!=="default"&&(
-                    <button onClick={()=>deleteCategory(cat.id)} title="Delete category" style={{background:"none",border:"none",color:"#333",cursor:"pointer",fontSize:"13px",padding:"0 2px",lineHeight:1}} onMouseEnter={e=>e.currentTarget.style.color='#e55'} onMouseLeave={e=>e.currentTarget.style.color='#333'}>×</button>
-                  )}
-                </div>
-              ))}
-              {showNewCat?(
-                <div style={{display:"flex",alignItems:"center",gap:"6px"}}>
-                  <input autoFocus value={newCatName} onChange={e=>setNewCatName(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")addCategory();if(e.key==="Escape")setShowNewCat(false)}} placeholder="Category name..." style={{...ST.input,width:"150px",padding:"5px 10px",fontSize:"12px"}} />
-                  <button onClick={addCategory} style={{...ST.btn,padding:"5px 12px",fontSize:"11px",backgroundColor:"#fff",color:"#000"}}>Add</button>
-                  <button onClick={()=>setShowNewCat(false)} style={{...ST.btn,padding:"5px 10px",fontSize:"11px",backgroundColor:"transparent",color:"#555",border:"1px solid #222"}}>Cancel</button>
-                </div>
-              ):(
-                <button onClick={()=>setShowNewCat(true)} style={{...catTabStyle("__new"),borderStyle:"dashed",color:"#444"}}>+ New Category</button>
-              )}
-            </div>
+      {/* EXCERPT TAB — rendered preview + tuple editor + font settings */}
+      {activeTab==="excerpt"&&step==="results"&&(
+        <div style={{display:"flex",minHeight:"calc(100vh - 90px)",paddingBottom:"60px"}}>
+          <div style={{width:"430px",minWidth:"390px",padding:"18px",borderRight:"1px solid #e8e6e1",overflowY:"auto",display:"flex",flexDirection:"column",gap:"14px"}}>
+            {getProject(author)&&<div style={{display:"flex",alignItems:"center",gap:"8px",padding:"8px 12px",backgroundColor:"#fff",borderRadius:"6px",border:"1px solid #e8e6e1"}}><span style={{fontSize:"10px",fontWeight:700,letterSpacing:"1.5px",padding:"3px 8px",borderRadius:"4px",backgroundColor:getProject(author)==="RE"?"#fef0ec":getProject(author)==="DK"?"#eef0fe":"#fdf0fa",color:getProject(author)==="RE"?"#e85d3a":getProject(author)==="DK"?"#6366f1":"#d946a8",fontFamily:"'DM Sans', sans-serif"}}>{getProject(author)}</span><span style={{fontSize:"11px",color:"#a09a93",fontFamily:"'DM Sans', sans-serif"}}>Tasks {getProject(author)}</span></div>}
 
-            {/* Upload zone */}
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"}}>
-              <label style={{...ST.label,marginBottom:0}}>
-                {activeCatName} <span style={{textTransform:"none",color:"#333",marginLeft:"4px"}}>— persists between sessions</span>
-              </label>
-              {activeCatPhotos.length>0&&<button onClick={handleClearCategory} style={{...ST.btn,padding:"4px 10px",fontSize:"10px",backgroundColor:"transparent",color:"#553333",border:"1px solid #331a1a"}}>Clear Category</button>}
+            <div style={{borderTop:"1px solid #e8e6e1",margin:"4px 0"}} />
+            <div><label style={ST.label}>Font</label><select value={fontName} onChange={e=>setFontName(e.target.value)} style={{...ST.input,cursor:"pointer",appearance:"auto"}}>{FONT_OPTIONS.map(f=><option key={f} value={f}>{f}</option>)}{customFontName&&<option value={customFontName}>{customFontName}</option>}</select></div>
+            <div>
+              <label style={ST.label}>Custom Font <span style={{textTransform:"none",color:"#c4bfb8"}}>(.ttf .woff2 .otf — select multiple for variants)</span></label>
+              <input ref={fontFileRef} type="file" accept=".ttf,.woff,.woff2,.otf" multiple onChange={e=>loadCustomFont(e.target.files)} style={{display:"none"}} />
+              <button onClick={()=>fontFileRef.current?.click()} style={{...ST.input,cursor:"pointer",fontSize:"12px",color:"#a09a93",textAlign:"left"}}>{customFontName?`✓ ${customFontName}`:"Choose font file..."}</button>
             </div>
-            <input ref={photoInputRef} type="file" accept="image/*" multiple style={{display:"none"}} onChange={e=>handlePhotoUpload(e.target.files)} />
-            <div onClick={()=>photoInputRef.current?.click()} onDragOver={e=>{e.preventDefault();e.stopPropagation();e.currentTarget.style.borderColor='#444'}} onDragLeave={e=>{e.currentTarget.style.borderColor='#1f1f1f'}} onDrop={e=>{e.preventDefault();e.stopPropagation();e.currentTarget.style.borderColor='#1f1f1f';handlePhotoUpload(e.dataTransfer.files)}} style={{...ST.card,cursor:"pointer",textAlign:"center",padding:"22px 20px",border:"1px dashed #1f1f1f",transition:"border-color 0.2s",marginBottom:"6px"}}>
-              <div style={{fontSize:"20px",marginBottom:"4px",opacity:0.35}}>🖼️</div>
-              <div style={{color:"#555",fontSize:"13px"}}>Drop photos here or click to browse</div>
-              <div style={{color:"#333",fontSize:"11px",marginTop:"3px",fontFamily:"'DM Mono',monospace"}}>Uploading to: <strong style={{color:"#666"}}>{activeCatName}</strong> · JPG, PNG, WebP</div>
+            <div>
+              <label style={ST.label}>Font Size <span style={{textTransform:"none",color:"#a09a93"}}>{fontSize}px</span></label>
+              <div style={{display:"flex",alignItems:"center",gap:"8px"}}><span style={{fontSize:"10px",color:"#c4bfb8"}}>10</span><input type="range" min={10} max={30} value={fontSize} onChange={e=>setFontSize(Number(e.target.value))} style={{flex:1,accentColor:"#e85d3a"}} /><span style={{fontSize:"10px",color:"#c4bfb8"}}>30</span></div>
             </div>
-            {uploadProgress&&<div style={{fontSize:"11px",color:"#888",fontFamily:"'DM Mono',monospace",marginBottom:"8px"}}>{uploadProgress}</div>}
+            <div><label style={ST.label}>Author / Book</label><input value={author} onChange={e=>setAuthor(e.target.value)} placeholder="Author — Book Title" style={ST.input} /></div>
+            <div>
+              <label style={ST.label}>Tuple Data <span style={{textTransform:"none",color:"#c4bfb8"}}>(editable)</span></label>
+              <textarea value={tupleRaw} onChange={e=>setTupleRaw(e.target.value)} spellCheck={false} style={{...ST.input,height:"300px",resize:"vertical",color:"#e85d3a",fontSize:"11px",fontFamily:"'DM Sans', monospace",lineHeight:"1.5"}} />
+            </div>
+            {error&&<div style={{padding:"8px 12px",backgroundColor:"#fef0ec",border:"1px solid #f5c6cb",borderRadius:"6px",color:"#dc3545",fontSize:"11px",fontFamily:"'DM Sans', sans-serif"}}>{error}</div>}
+            <div style={{display:"flex",gap:"8px"}}>
+              <button onClick={doRender} style={{...ST.btn,flex:1,backgroundColor:"#e85d3a",color:"#fff",borderRadius:"8px"}}>Render</button>
+              {rendered&&<button onClick={doCopy} style={{...ST.btn,padding:"10px 14px",backgroundColor:copied?"#edf7f1":"transparent",color:copied?"#2da562":"#6b6660",border:`1px solid ${copied?"#c3e6cb":"#e8e6e1"}`}}>{copied?"✓ Copied":"Copy Image"}</button>}
+            </div>
+            <div style={{...ST.card,fontSize:"11px"}}>
+              <div style={{...ST.label,marginBottom:"6px"}}>Legend</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:"8px",marginBottom:"6px"}}>
+                {[["Male","#B5CDFD"],["Female","#FEC2D3"],["Internal","#FFF8B3"],["Other","#FDD9B0"],["Narr.",null]].map(([l,c])=>(<div key={l} style={{display:"flex",alignItems:"center",gap:"4px"}}><div style={{width:"10px",height:"10px",borderRadius:"2px",backgroundColor:c||"transparent",border:c?"none":"1px solid #e8e6e1"}} /><span style={{color:"#a09a93"}}>{l}</span></div>))}
+              </div>
+              <div style={{color:"#c4bfb8",fontFamily:"'DM Sans', sans-serif",lineHeight:1.6,fontSize:"10px"}}>_flow = same line · _underline = underline · _bold = bold · _italic = italic · w*rd = censor</div>
+            </div>
           </div>
 
-          {/* AI Photo Matching */}
-          {activeCatPhotos.length>0&&step==="results"&&(
-            <div style={{...ST.card,marginBottom:"20px"}}>
-              <label style={{...ST.label,marginBottom:"8px"}}>AI Photo Matching — searching in <strong style={{color:"#777",textTransform:"none",letterSpacing:0}}>{activeCatName}</strong></label>
-              <div style={{display:"flex",gap:"8px",marginBottom:"8px"}}>
-                <input value={photoPrompt} onChange={e=>setPhotoPrompt(e.target.value)} placeholder='e.g. "2 photos" or "1 photo of man and 1 of woman"' style={{...ST.input,flex:1,fontSize:"12px"}} />
-                <button onClick={matchPhotos} disabled={photoMatching} style={{...ST.btn,backgroundColor:photoMatching?"#151515":"#fff",color:photoMatching?"#444":"#000",whiteSpace:"nowrap",minWidth:"120px"}}>
-                  {photoMatching?(<span style={{display:"flex",alignItems:"center",gap:"6px"}}><span style={{display:"inline-block",width:"12px",height:"12px",border:"2px solid #333",borderTopColor:"#888",borderRadius:"50%",animation:"spin 0.8s linear infinite"}} />Matching...</span>):"Match Photos"}
-                </button>
-              </div>
-              {photoMatchError&&<div style={{fontSize:"11px",color:"#e55",fontFamily:"'DM Mono',monospace"}}>{photoMatchError}</div>}
-              {aiPickedPhotos.length>0&&<div style={{fontSize:"11px",color:"#8b8",fontFamily:"'DM Mono',monospace",marginTop:"4px"}}>✓ Gemini selected {aiPickedPhotos.length} photo{aiPickedPhotos.length!==1?'s':''} — click any to change</div>}
-            </div>
-          )}
-          {activeCatPhotos.length>0&&step!=="results"&&(
-            <div style={{...ST.card,marginBottom:"20px",borderColor:"#1a1a0f"}}>
-              <div style={{fontSize:"11px",color:"#666",fontFamily:"'DM Mono',monospace"}}>💡 Generate an excerpt first, then come back to use AI photo matching</div>
-            </div>
-          )}
-
-          {/* Photo Grid */}
-          {photosLoading?(
-            <div style={{textAlign:"center",color:"#444",padding:"40px",fontFamily:"'DM Mono',monospace",fontSize:"12px"}}>Loading library...</div>
-          ):activeCatPhotos.length===0?(
-            <div style={{textAlign:"center",color:"#333",padding:"60px 20px"}}>
-              <div style={{fontSize:"36px",marginBottom:"12px",opacity:0.2}}>🖼️</div>
-              <div style={{fontSize:"13px",color:"#444"}}>No photos in {activeCatName} yet</div>
-              <div style={{fontSize:"11px",color:"#333",marginTop:"6px",fontFamily:"'DM Mono',monospace"}}>Drop photos above to get started</div>
-            </div>
-          ):(
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(130px, 1fr))",gap:"10px"}}>
-              {activeCatPhotos.map(p=>{
-                const isSel=selectedPhotos.includes(p.id);const isAi=aiPickedPhotos.includes(p.id);
-                return(
-                  <div key={p.id} onClick={()=>togglePhoto(p.id)} style={{position:"relative",borderRadius:"6px",overflow:"hidden",cursor:"pointer",transition:"all 0.15s",border:isSel?(isAi?"2px solid #8b8":"2px solid #fff"):"2px solid #1a1a1a",opacity:selectedPhotos.length>0&&!isSel?0.5:1,transform:isSel?"scale(1.02)":"scale(1)"}}>
-                    <img src={p.thumb} alt={p.name} style={{width:"100%",aspectRatio:"1",objectFit:"cover",display:"block"}} />
-                    {isSel&&<div style={{position:"absolute",top:"6px",left:"6px",width:"20px",height:"20px",borderRadius:"50%",backgroundColor:isAi?"#8b8":"#fff",color:"#000",fontSize:"12px",fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center"}}>✓</div>}
-                    {isAi&&<div style={{position:"absolute",top:"6px",right:"6px",padding:"2px 6px",borderRadius:"3px",backgroundColor:"rgba(0,0,0,0.75)",color:"#8b8",fontSize:"9px",fontFamily:"'DM Mono',monospace",fontWeight:500}}>AI</div>}
-                    <button
-                      onClick={e=>{e.stopPropagation();e.preventDefault();handleDeletePhoto(p.id)}}
-                      title="Delete photo"
-                      style={{position:"absolute",bottom:"4px",right:"4px",width:"26px",height:"26px",borderRadius:"50%",backgroundColor:"rgba(0,0,0,0.85)",border:"1px solid #444",color:"#888",fontSize:"15px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1,zIndex:10}}
-                      onMouseEnter={e=>{e.currentTarget.style.color='#ff5555';e.currentTarget.style.borderColor='#ff5555'}}
-                      onMouseLeave={e=>{e.currentTarget.style.color='#888';e.currentTarget.style.borderColor='#444'}}
-                    >×</button>
-                    <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"16px 6px 4px",fontSize:"9px",color:"#aaa",background:"linear-gradient(transparent,rgba(0,0,0,0.8))",fontFamily:"'DM Mono',monospace",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.name}</div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-          {selectedPhotos.length>0&&(
-            <div style={{marginTop:"16px",padding:"10px 14px",backgroundColor:"#0f0f0f",borderRadius:"6px",border:"1px solid #1a1a1a",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <span style={{fontSize:"12px",color:"#888"}}>{selectedPhotos.length} photo{selectedPhotos.length!==1?'s':''} selected</span>
-              <button onClick={()=>{setSelectedPhotos([]);setAiPickedPhotos([])}} style={{...ST.btn,padding:"4px 12px",fontSize:"11px",backgroundColor:"transparent",color:"#555",border:"1px solid #222"}}>Clear Selection</button>
-            </div>
-          )}
+          <div style={{flex:1,padding:"18px",overflowY:"auto",display:"flex",flexDirection:"column",alignItems:"center"}}>
+            <div style={{...ST.label,alignSelf:"flex-start",marginBottom:"12px"}}>Preview{author&&<span style={{textTransform:"none",marginLeft:"10px",color:"#c4bfb8",letterSpacing:"0"}}> — {author}</span>}</div>
+            <div style={{boxShadow:rendered?"0 4px 24px rgba(26,24,21,0.08)":"none",borderRadius:rendered?"2px":"0"}}><canvas ref={canvasRef} style={{display:rendered?"block":"none"}} /></div>
+            {!rendered&&(<div style={{width:"540px",height:"350px",backgroundColor:"#fff",borderRadius:"8px",border:"1px dashed #e8e6e1",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:"10px"}}><div style={{fontSize:"28px",opacity:0.2}}>📖</div><div style={{color:"#c4bfb8",fontSize:"12px",fontFamily:"'DM Sans', sans-serif"}}>{tupleRaw?"Click Render to generate preview":"Generate an excerpt to preview"}</div></div>)}
+          </div>
         </div>
       )}
 
-      {/* RESULTS TAB */}
-      {activeTab==="results"&&step==="results"&&(
-        <div style={{display:"flex",minHeight:"calc(100vh - 90px)",paddingBottom:"60px"}}>
-          <div style={{width:"430px",minWidth:"390px",padding:"18px",borderRight:"1px solid #161616",overflowY:"auto",display:"flex",flexDirection:"column",gap:"14px"}}>
-            {getProject(author)&&<div style={{display:"flex",alignItems:"center",gap:"8px",padding:"8px 12px",backgroundColor:"#111",borderRadius:"6px",border:"1px solid #1a1a1a"}}><span style={{fontSize:"10px",fontWeight:700,letterSpacing:"1.5px",padding:"3px 8px",borderRadius:"4px",backgroundColor:getProject(author)==="RE"?"#2a1515":getProject(author)==="DK"?"#1f2a3d":"#152a15",color:getProject(author)==="RE"?"#f0a5a5":getProject(author)==="DK"?"#a5c4f0":"#a5f0a5",fontFamily:"'DM Mono',monospace"}}>{getProject(author)}</span><span style={{fontSize:"11px",color:"#555",fontFamily:"'DM Mono',monospace"}}>Tasks {getProject(author)}</span></div>}
+      {/* POST TAB — hook, hook forge, caption, context, photos */}
+      {activeTab==="post"&&step==="results"&&(
+        <div style={{maxWidth:"640px",margin:"0 auto",padding:"24px",display:"flex",flexDirection:"column",gap:"14px"}}>
             <div style={ST.card}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}}><label style={{...ST.label,marginBottom:0}}>Hook (Slide 1)</label><CopyBtn field="hook" text={hook} /></div>
-              <textarea value={hook} onChange={e=>setHook(e.target.value)} style={{...ST.input,height:"60px",resize:"vertical",fontSize:"14px",fontWeight:600,color:"#eee"}} />
+              <textarea value={hook} onChange={e=>setHook(e.target.value)} style={{...ST.input,height:"60px",resize:"vertical",fontSize:"14px",fontWeight:600,color:"#1a1815"}} />
             </div>
 
             {/* === HOOK FORGE === */}
-            <div style={{...ST.card,border:hookForgeOpen?"1px solid #2a2a1a":"1px solid #1a1a1a",transition:"border-color 0.2s"}}>
+            <div style={{...ST.card,border:hookForgeOpen?"1px solid #d4c060":"1px solid #e8e6e1",transition:"border-color 0.2s"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:hookForgeOpen?"10px":"0"}}>
                 <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
                   <span style={{fontSize:"13px"}}>⚡</span>
                   <label style={{...ST.label,marginBottom:0,color:"#b8a040"}}>Hook Forge</label>
-                  <span style={{fontSize:"9px",padding:"1px 6px",borderRadius:"3px",backgroundColor:"#1a1a0f",color:"#8b8040",fontFamily:"'DM Mono',monospace",border:"1px solid #2a2a1a"}}>Claude-powered</span>
+                  <span style={{fontSize:"9px",padding:"1px 6px",borderRadius:"3px",backgroundColor:"#faf6e6",color:"#8b7020",fontFamily:"'DM Sans', sans-serif",border:"1px solid #e8ddb0"}}>Claude-powered</span>
                 </div>
-                <button onClick={hookForgeLoading?undefined:generateHookVariants} disabled={hookForgeLoading} style={{...ST.btn,padding:"5px 14px",fontSize:"10px",backgroundColor:hookForgeLoading?"#1a1a1a":"#2a2a1a",color:hookForgeLoading?"#555":"#d4c060",border:"1px solid #3a3a2a",transition:"all 0.15s"}}>
+                <button onClick={hookForgeLoading?undefined:generateHookVariants} disabled={hookForgeLoading} style={{...ST.btn,padding:"5px 14px",fontSize:"10px",backgroundColor:hookForgeLoading?"#f0eeea":"#faf6e6",color:hookForgeLoading?"#a09a93":"#8b7020",border:"1px solid #e8ddb0",transition:"all 0.15s"}}>
                   {hookForgeLoading?"Generating...":"Generate 7 Variants"}
                 </button>
               </div>
-              {hookForgeError&&<div style={{fontSize:"11px",color:"#e55",fontFamily:"'DM Mono',monospace",padding:"6px 0"}}>{hookForgeError}</div>}
+              {hookForgeError&&<div style={{fontSize:"11px",color:"#dc3545",fontFamily:"'DM Sans', sans-serif",padding:"6px 0"}}>{hookForgeError}</div>}
               {hookForgeOpen&&hookVariants.length>0&&(
                 <div style={{display:"flex",flexDirection:"column",gap:"6px"}}>
                   {hookVariants.map((v,i)=>{
@@ -1531,18 +1550,18 @@ No markdown, no backticks.
                     return(
                       <React.Fragment key={i}>
                         {isFirstPov&&(
-                          <div style={{fontSize:"9px",textTransform:"uppercase",letterSpacing:"1.5px",color:"#555",fontFamily:"'DM Mono',monospace",padding:"6px 0 2px 0",borderTop:"1px solid #1a1a1a",marginTop:"2px"}}>POV Pair — her side + his side</div>
+                          <div style={{fontSize:"9px",textTransform:"uppercase",letterSpacing:"1.5px",color:"#a09a93",fontFamily:"'DM Sans', sans-serif",padding:"6px 0 2px 0",borderTop:"1px solid #e8e6e1",marginTop:"2px"}}>POV Pair — her side + his side</div>
                         )}
-                        <div style={{display:"flex",gap:"8px",alignItems:"flex-start",padding:"8px 10px",backgroundColor:isFirstPov||isLastPov?"#121218":"#111",borderRadius:isFirstPov?"6px 6px 0 0":isLastPov?"0 0 6px 6px":"6px",border:"1px solid #1a1a1a",borderBottom:isFirstPov?"1px dashed #252530":"1px solid #1a1a1a",borderTop:isLastPov?"none":"1px solid #1a1a1a",transition:"border-color 0.15s",cursor:"pointer"}} onClick={()=>setHook(v.hook)} onMouseEnter={e=>e.currentTarget.style.borderColor='#333'} onMouseLeave={e=>e.currentTarget.style.borderColor='#1a1a1a'}>
-                          <span style={{fontSize:"9px",padding:"2px 6px",borderRadius:"3px",backgroundColor:"#0f0f0f",color:typeColors[v.type]||"#888",fontFamily:"'DM Mono',monospace",border:"1px solid #1a1a1a",whiteSpace:"nowrap",flexShrink:0,marginTop:"2px"}}>{typeLabels[v.type]||v.type}</span>
-                          <span style={{fontSize:"12px",color:"#ccc",lineHeight:"1.5",flex:1}}>{v.hook}</span>
-                          <button onClick={e=>{e.stopPropagation();copyField(v.hook,"hv"+i)}} style={{...ST.btn,padding:"2px 8px",fontSize:"9px",backgroundColor:"transparent",color:copiedField==="hv"+i?"#5cb85c":"#444",border:"1px solid #1a1a1a",flexShrink:0}}>{copiedField==="hv"+i?"✓":"Copy"}</button>
+                        <div style={{display:"flex",gap:"8px",alignItems:"flex-start",padding:"8px 10px",backgroundColor:isFirstPov||isLastPov?"#f8f7f5":"#fff",borderRadius:isFirstPov?"6px 6px 0 0":isLastPov?"0 0 6px 6px":"6px",border:"1px solid #e8e6e1",borderBottom:isFirstPov?"1px dashed #e8e6e1":"1px solid #e8e6e1",borderTop:isLastPov?"none":"1px solid #e8e6e1",transition:"border-color 0.15s",cursor:"pointer"}} onClick={()=>setHook(v.hook)} onMouseEnter={e=>e.currentTarget.style.borderColor='#e85d3a'} onMouseLeave={e=>e.currentTarget.style.borderColor='#e8e6e1'}>
+                          <span style={{fontSize:"9px",padding:"2px 6px",borderRadius:"3px",backgroundColor:"#f8f7f5",color:typeColors[v.type]||"#888",fontFamily:"'DM Sans', sans-serif",border:"1px solid #e8e6e1",whiteSpace:"nowrap",flexShrink:0,marginTop:"2px"}}>{typeLabels[v.type]||v.type}</span>
+                          <span style={{fontSize:"12px",color:"#1a1815",lineHeight:"1.5",flex:1}}>{v.hook}</span>
+                          <button onClick={e=>{e.stopPropagation();copyField(v.hook,"hv"+i)}} style={{...ST.btn,padding:"2px 8px",fontSize:"9px",backgroundColor:"transparent",color:copiedField==="hv"+i?"#5cb85c":"#a09a93",border:"1px solid #e8e6e1",flexShrink:0}}>{copiedField==="hv"+i?"✓":"Copy"}</button>
                         </div>
                         {isLastPov&&<div style={{height:"2px"}} />}
                       </React.Fragment>
                     );
                   })}
-                  <div style={{fontSize:"10px",color:"#444",fontFamily:"'DM Mono',monospace",textAlign:"center",padding:"4px 0"}}>Click any hook to use it as your main hook</div>
+                  <div style={{fontSize:"10px",color:"#a09a93",fontFamily:"'DM Sans', sans-serif",textAlign:"center",padding:"4px 0"}}>Click any hook to use it as your main hook</div>
                 </div>
               )}
             </div>
@@ -1552,32 +1571,32 @@ No markdown, no backticks.
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}}>
                 <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
                   <label style={{...ST.label,marginBottom:0}}>Caption</label>
-                  <button onClick={()=>setMysteryMode(!mysteryMode)} style={{padding:"2px 8px",fontSize:"9px",borderRadius:"10px",border:"1px solid",cursor:"pointer",fontFamily:"'DM Mono',monospace",borderColor:mysteryMode?"#4a2540":"#1a1a1a",backgroundColor:mysteryMode?"#2a1525":"transparent",color:mysteryMode?"#da7e9e":"#555",transition:"all 0.15s"}} title="Mystery mode hides the book title to drive comments">{mysteryMode?"🔮 Mystery Mode":"📖 Normal Mode"}</button>
+                  <button onClick={()=>setMysteryMode(!mysteryMode)} style={{padding:"2px 8px",fontSize:"9px",borderRadius:"10px",border:"1px solid",cursor:"pointer",fontFamily:"'DM Sans', sans-serif",borderColor:mysteryMode?"#d946a8":"#e8e6e1",backgroundColor:mysteryMode?"#fdf0fa":"transparent",color:mysteryMode?"#d946a8":"#a09a93",transition:"all 0.15s"}} title="Mystery mode hides the book title to drive comments">{mysteryMode?"🔮 Mystery Mode":"📖 Normal Mode"}</button>
                   {anthropicKey.trim()&&(
-                    <button onClick={detectTropesAndBuildCaption} disabled={captionGenLoading} style={{padding:"2px 8px",fontSize:"9px",borderRadius:"10px",border:"1px solid #2a2a1a",cursor:"pointer",fontFamily:"'DM Mono',monospace",backgroundColor:captionGenLoading?"#1a1a1a":"#1a1a0f",color:captionGenLoading?"#555":"#b8a040",transition:"all 0.15s"}}>{captionGenLoading?"Detecting...":"Auto-detect Tropes"}</button>
+                    <button onClick={detectTropesAndBuildCaption} disabled={captionGenLoading} style={{padding:"2px 8px",fontSize:"9px",borderRadius:"10px",border:"1px solid #e8ddb0",cursor:"pointer",fontFamily:"'DM Sans', sans-serif",backgroundColor:captionGenLoading?"#f0eeea":"#faf6e6",color:captionGenLoading?"#a09a93":"#8b7020",transition:"all 0.15s"}}>{captionGenLoading?"Detecting...":"Auto-detect Tropes"}</button>
                   )}
                 </div>
                 <CopyBtn field="caption" text={caption} />
               </div>
-              {mysteryMode&&<div style={{fontSize:"10px",color:"#da7e9e",fontFamily:"'DM Mono',monospace",marginBottom:"6px",padding:"4px 8px",backgroundColor:"#1a0f15",borderRadius:"4px",border:"1px solid #2a1520"}}>Mystery mode: book title hidden. Drop it in the comments to drive engagement.</div>}
+              {mysteryMode&&<div style={{fontSize:"10px",color:"#da7e9e",fontFamily:"'DM Sans', sans-serif",marginBottom:"6px",padding:"4px 8px",backgroundColor:"#fdf0f6",borderRadius:"4px",border:"1px solid #f0c0d8"}}>Mystery mode: book title hidden. Drop it in the comments to drive engagement.</div>}
               <textarea value={caption} onChange={e=>setCaption(e.target.value)} style={{...ST.input,height:"110px",resize:"vertical",fontSize:"12px",lineHeight:"1.6"}} />
               {detectedTropes.length>0&&(
                 <div style={{marginTop:"8px"}}>
                   <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
                     {detectedTropes.map((t,i)=>(
-                      <span key={i} style={{fontSize:"10px",padding:"2px 8px",borderRadius:"10px",backgroundColor:"#151515",color:"#888",border:"1px solid #1f1f1f",fontFamily:"'DM Mono',monospace"}}>{t}</span>
+                      <span key={i} style={{fontSize:"10px",padding:"2px 8px",borderRadius:"10px",backgroundColor:"#f0eeea",color:"#6b6660",border:"1px solid #e8e6e1",fontFamily:"'DM Sans', sans-serif"}}>{t}</span>
                     ))}
                   </div>
                 </div>
               )}
               {window._pinterestSearches&&window._pinterestSearches.length>0&&(
-                <div style={{marginTop:"8px",padding:"8px 10px",backgroundColor:"#0f1010",borderRadius:"6px",border:"1px solid #1a1f1a"}}>
-                  <div style={{fontSize:"9px",textTransform:"uppercase",letterSpacing:"1px",color:"#5a8a5a",marginBottom:"6px",fontFamily:"'DM Mono',monospace"}}>Pinterest Search Suggestions</div>
+                <div style={{marginTop:"8px",padding:"8px 10px",backgroundColor:"#f0f7f0",borderRadius:"6px",border:"1px solid #c3e6cb"}}>
+                  <div style={{fontSize:"9px",textTransform:"uppercase",letterSpacing:"1px",color:"#2da562",marginBottom:"6px",fontFamily:"'DM Sans', sans-serif"}}>Pinterest Search Suggestions</div>
                   <div style={{display:"flex",flexDirection:"column",gap:"4px"}}>
                     {window._pinterestSearches.map((s,i)=>(
                       <div key={i} style={{display:"flex",alignItems:"center",gap:"6px"}}>
-                        <span style={{fontSize:"11px",color:"#8b8",fontFamily:"'DM Mono',monospace",flex:1}}>{s}</span>
-                        <button onClick={()=>copyField(s,"ps"+i)} style={{...ST.btn,padding:"1px 6px",fontSize:"9px",backgroundColor:"transparent",color:copiedField==="ps"+i?"#5cb85c":"#444",border:"1px solid #1a1a1a"}}>{copiedField==="ps"+i?"✓":"Copy"}</button>
+                        <span style={{fontSize:"11px",color:"#2da562",fontFamily:"'DM Sans', sans-serif",flex:1}}>{s}</span>
+                        <button onClick={()=>copyField(s,"ps"+i)} style={{...ST.btn,padding:"1px 6px",fontSize:"9px",backgroundColor:"transparent",color:copiedField==="ps"+i?"#5cb85c":"#a09a93",border:"1px solid #e8e6e1"}}>{copiedField==="ps"+i?"✓":"Copy"}</button>
                       </div>
                     ))}
                   </div>
@@ -1593,110 +1612,74 @@ No markdown, no backticks.
               <div style={ST.card}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"}}>
                   <label style={{...ST.label,marginBottom:0}}>Selected Photos</label>
-                  <button onClick={()=>setActiveTab("photos")} style={{...ST.btn,padding:"3px 8px",fontSize:"10px",backgroundColor:"transparent",color:"#555",border:"1px solid #222"}}>Edit</button>
+                  <button onClick={()=>setActiveTab("photos")} style={{...ST.btn,padding:"3px 8px",fontSize:"10px",backgroundColor:"transparent",color:"#a09a93",border:"1px solid #e8e6e1"}}>Edit</button>
                 </div>
                 <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
                   {selectedPhotos.map(id=>{const p=photos.find(ph=>ph.id===id);if(!p)return null;return(<div key={id} style={{position:"relative",display:"inline-block"}}>
-                    <img src={p.full||p.thumb} alt={p.name} style={{width:"70px",height:"70px",objectFit:"cover",borderRadius:"4px",border:"1px solid #222",display:"block"}} />
-                    {aiPickedPhotos.includes(id)&&<div style={{position:"absolute",top:"2px",left:"2px",padding:"1px 4px",borderRadius:"2px",backgroundColor:"rgba(0,0,0,0.7)",color:"#8b8",fontSize:"8px",fontFamily:"'DM Mono',monospace"}}>AI</div>}
-                    <button onClick={async(e)=>{e.stopPropagation();try{const img=new Image();img.crossOrigin="anonymous";img.onload=async()=>{const c=document.createElement("canvas");c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext("2d").drawImage(img,0,0);const blob=await new Promise(r=>c.toBlob(r,"image/png"));await navigator.clipboard.write([new ClipboardItem({"image/png":blob})]);e.currentTarget.textContent="✓";setTimeout(()=>{if(e.currentTarget)e.currentTarget.textContent="⎘"},1500)};img.src=p.full||p.thumb}catch(err){console.error(err)}}} title="Copy photo" style={{position:"absolute",bottom:"2px",right:"2px",width:"20px",height:"20px",borderRadius:"3px",backgroundColor:"rgba(0,0,0,0.8)",border:"1px solid #333",color:"#aaa",fontSize:"11px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}} onMouseEnter={e=>e.currentTarget.style.color="#fff"} onMouseLeave={e=>e.currentTarget.style.color="#aaa"}>⎘</button>
+                    <img src={p.full||p.thumb} alt={p.name} style={{width:"70px",height:"70px",objectFit:"cover",borderRadius:"4px",border:"1px solid #e8e6e1",borderRadius:"8px",display:"block"}} />
+                    {aiPickedPhotos.includes(id)&&<div style={{position:"absolute",top:"2px",left:"2px",padding:"1px 4px",borderRadius:"2px",backgroundColor:"rgba(26,24,21,0.7)",color:"#2da562",fontSize:"8px",fontFamily:"'DM Sans', sans-serif"}}>AI</div>}
+                    <button onClick={async(e)=>{e.stopPropagation();try{const img=new Image();img.crossOrigin="anonymous";img.onload=async()=>{const c=document.createElement("canvas");c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext("2d").drawImage(img,0,0);const blob=await new Promise(r=>c.toBlob(r,"image/png"));await navigator.clipboard.write([new ClipboardItem({"image/png":blob})]);e.currentTarget.textContent="✓";setTimeout(()=>{if(e.currentTarget)e.currentTarget.textContent="⎘"},1500)};img.src=p.full||p.thumb}catch(err){console.error(err)}}} title="Copy photo" style={{position:"absolute",bottom:"2px",right:"2px",width:"20px",height:"20px",borderRadius:"3px",backgroundColor:"rgba(26,24,21,0.8)",border:"1px solid #333",color:"#6b6660",fontSize:"11px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}} onMouseEnter={e=>e.currentTarget.style.color="#fff"} onMouseLeave={e=>e.currentTarget.style.color="#aaa"}>⎘</button>
                   </div>)})}
                 </div>
               </div>
             )}
-
-            <div style={{borderTop:"1px solid #1a1a1a",margin:"4px 0"}} />
-            <div><label style={ST.label}>Font</label><select value={fontName} onChange={e=>setFontName(e.target.value)} style={{...ST.input,cursor:"pointer",appearance:"auto"}}>{FONT_OPTIONS.map(f=><option key={f} value={f}>{f}</option>)}{customFontName&&<option value={customFontName}>{customFontName}</option>}</select></div>
-            <div>
-              <label style={ST.label}>Custom Font <span style={{textTransform:"none",color:"#333"}}>(.ttf .woff2 .otf — select multiple for variants)</span></label>
-              <input ref={fontFileRef} type="file" accept=".ttf,.woff,.woff2,.otf" multiple onChange={e=>loadCustomFont(e.target.files)} style={{display:"none"}} />
-              <button onClick={()=>fontFileRef.current?.click()} style={{...ST.input,cursor:"pointer",fontSize:"12px",color:"#555",textAlign:"left"}}>{customFontName?`✓ ${customFontName}`:"Choose font file..."}</button>
-            </div>
-            <div>
-              <label style={ST.label}>Font Size <span style={{textTransform:"none",color:"#444"}}>{fontSize}px</span></label>
-              <div style={{display:"flex",alignItems:"center",gap:"8px"}}><span style={{fontSize:"10px",color:"#333"}}>10</span><input type="range" min={10} max={30} value={fontSize} onChange={e=>setFontSize(Number(e.target.value))} style={{flex:1,accentColor:"#555"}} /><span style={{fontSize:"10px",color:"#333"}}>30</span></div>
-            </div>
-            <div><label style={ST.label}>Author / Book</label><input value={author} onChange={e=>setAuthor(e.target.value)} placeholder="Author — Book Title" style={ST.input} /></div>
-            <div>
-              <label style={ST.label}>Tuple Data <span style={{textTransform:"none",color:"#333"}}>(editable)</span></label>
-              <textarea value={tupleRaw} onChange={e=>setTupleRaw(e.target.value)} spellCheck={false} style={{...ST.input,height:"300px",resize:"vertical",color:"#b8e64e",fontSize:"11px",fontFamily:"'DM Mono','Fira Code',monospace",lineHeight:"1.5"}} />
-            </div>
-            {error&&<div style={{padding:"8px 12px",backgroundColor:"#1a0f0f",border:"1px solid #331a1a",borderRadius:"6px",color:"#e55",fontSize:"11px",fontFamily:"'DM Mono',monospace"}}>{error}</div>}
-            <div style={{display:"flex",gap:"8px"}}>
-              <button onClick={doRender} style={{...ST.btn,flex:1,backgroundColor:"#fff",color:"#000"}}>Render</button>
-              {rendered&&<button onClick={doCopy} style={{...ST.btn,padding:"10px 14px",backgroundColor:copied?"#122e12":"transparent",color:copied?"#5cb85c":"#666",border:`1px solid ${copied?"#2a5a2a":"#222"}`}}>{copied?"✓ Copied":"Copy Image"}</button>}
-            </div>
-            <div style={{...ST.card,fontSize:"11px"}}>
-              <div style={{...ST.label,marginBottom:"6px"}}>Legend</div>
-              <div style={{display:"flex",flexWrap:"wrap",gap:"8px",marginBottom:"6px"}}>
-                {[["Male","#B5CDFD"],["Female","#FEC2D3"],["Internal","#FFF8B3"],["Other","#FDD9B0"],["Narr.",null]].map(([l,c])=>(<div key={l} style={{display:"flex",alignItems:"center",gap:"4px"}}><div style={{width:"10px",height:"10px",borderRadius:"2px",backgroundColor:c||"transparent",border:c?"none":"1px solid #333"}} /><span style={{color:"#555"}}>{l}</span></div>))}
-              </div>
-              <div style={{color:"#333",fontFamily:"'DM Mono',monospace",lineHeight:1.6,fontSize:"10px"}}>_flow = same line · _underline = underline · _bold = bold · _italic = italic · w*rd = censor</div>
-            </div>
-          </div>
-
-          <div style={{flex:1,padding:"18px",overflowY:"auto",display:"flex",flexDirection:"column",alignItems:"center"}}>
-            <div style={{...ST.label,alignSelf:"flex-start",marginBottom:"12px"}}>Preview{author&&<span style={{textTransform:"none",marginLeft:"10px",color:"#333",letterSpacing:"0"}}> — {author}</span>}</div>
-            <div style={{boxShadow:rendered?"0 4px 40px rgba(0,0,0,0.6)":"none",borderRadius:rendered?"2px":"0"}}><canvas ref={canvasRef} style={{display:rendered?"block":"none"}} /></div>
-            {!rendered&&(<div style={{width:"540px",height:"350px",backgroundColor:"#0f0f0f",borderRadius:"8px",border:"1px dashed #1a1a1a",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:"10px"}}><div style={{fontSize:"28px",opacity:0.2}}>📖</div><div style={{color:"#333",fontSize:"12px",fontFamily:"'DM Mono',monospace"}}>{tupleRaw?"Click Render to generate preview":"Waiting for Gemini response..."}</div></div>)}
-          </div>
         </div>
       )}
 
-      {/* CHAT DRAWER — collapsible at bottom, only on results */}
-      {activeTab==="results"&&step==="results"&&(
+      {/* CHAT DRAWER — collapsible at bottom, on excerpt or post tabs */}
+      {(activeTab==="excerpt"||activeTab==="post")&&step==="results"&&(
         <div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,transition:"all 0.3s ease"}}>
           {/* Toggle bar */}
-          <div onClick={()=>{setChatOpen(!chatOpen);if(!chatOpen)setTimeout(()=>chatInputRef.current?.focus(),100)}} style={{padding:"10px 24px",backgroundColor:"#111",borderTop:"1px solid #1f1f1f",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between",userSelect:"none"}}>
+          <div onClick={()=>{setChatOpen(!chatOpen);if(!chatOpen)setTimeout(()=>chatInputRef.current?.focus(),100)}} style={{padding:"10px 24px",backgroundColor:"#fff",borderTop:"1px solid #e8e6e1",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between",userSelect:"none"}}>
             <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
               <span style={{fontSize:"14px"}}>💬</span>
-              <span style={{fontSize:"12px",fontWeight:600,color:"#888",fontFamily:UI_FONT}}>Ask Gemini about this scene</span>
-              {chatMessages.length>0&&<span style={{fontSize:"9px",backgroundColor:"#1a1a1a",padding:"1px 6px",borderRadius:"8px",color:"#666",fontFamily:"'DM Mono',monospace"}}>{chatMessages.length}</span>}
+              <span style={{fontSize:"12px",fontWeight:600,color:"#6b6660",fontFamily:UI_FONT}}>Ask Gemini about this scene</span>
+              {chatMessages.length>0&&<span style={{fontSize:"9px",backgroundColor:"#f0eeea",padding:"1px 6px",borderRadius:"8px",color:"#a09a93",fontFamily:"'DM Sans', sans-serif"}}>{chatMessages.length}</span>}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:"12px"}}>
               {chatOpen&&chatMessages.length>0&&(
-                <button onClick={e=>{e.stopPropagation();setChatMessages([])}} style={{...ST.btn,padding:"3px 10px",fontSize:"10px",backgroundColor:"transparent",color:"#444",border:"1px solid #1a1a1a"}}>Clear</button>
+                <button onClick={e=>{e.stopPropagation();setChatMessages([])}} style={{...ST.btn,padding:"3px 10px",fontSize:"10px",backgroundColor:"transparent",color:"#a09a93",border:"1px solid #e8e6e1"}}>Clear</button>
               )}
-              <span style={{color:"#444",fontSize:"16px",transition:"transform 0.3s",transform:chatOpen?"rotate(180deg)":"rotate(0deg)"}}>▲</span>
+              <span style={{color:"#a09a93",fontSize:"16px",transition:"transform 0.3s",transform:chatOpen?"rotate(180deg)":"rotate(0deg)"}}>▲</span>
             </div>
           </div>
 
           {/* Chat panel */}
           {chatOpen&&(
-            <div style={{backgroundColor:"#0d0d0d",borderTop:"1px solid #1a1a1a",height:"340px",display:"flex",flexDirection:"column"}}>
+            <div style={{backgroundColor:"#faf9f7",borderTop:"1px solid #e8e6e1",height:"340px",display:"flex",flexDirection:"column"}}>
               {/* Context mode toggle */}
-              <div style={{padding:"8px 24px",borderBottom:"1px solid #141414",display:"flex",alignItems:"center",gap:"12px",flexShrink:0}}>
-                <span style={{fontSize:"10px",color:"#444",fontFamily:"'DM Mono',monospace",textTransform:"uppercase",letterSpacing:"1px"}}>Context:</span>
-                <button onClick={()=>setChatContextMode("excerpt")} style={{padding:"4px 12px",fontSize:"11px",borderRadius:"12px",border:"1px solid",cursor:"pointer",fontFamily:UI_FONT,borderColor:chatContextMode==="excerpt"?"#444":"#1a1a1a",backgroundColor:chatContextMode==="excerpt"?"#1e1e1e":"transparent",color:chatContextMode==="excerpt"?"#ddd":"#555",transition:"all 0.15s"}}>Excerpt Only</button>
-                <button onClick={()=>setChatContextMode("full")} style={{padding:"4px 12px",fontSize:"11px",borderRadius:"12px",border:"1px solid",cursor:"pointer",fontFamily:UI_FONT,borderColor:chatContextMode==="full"?"#444":"#1a1a1a",backgroundColor:chatContextMode==="full"?"#1e1e1e":"transparent",color:chatContextMode==="full"?"#ddd":"#555",transition:"all 0.15s"}}>Full Book</button>
-                <span style={{fontSize:"10px",color:"#333",fontFamily:"'DM Mono',monospace",marginLeft:"4px"}}>{chatContextMode==="full"?"Gemini can see the entire book":"Gemini sees hook + caption + context + excerpt"}</span>
+              <div style={{padding:"8px 24px",borderBottom:"1px solid #f0eeea",display:"flex",alignItems:"center",gap:"12px",flexShrink:0}}>
+                <span style={{fontSize:"10px",color:"#a09a93",fontFamily:"'DM Sans', sans-serif",textTransform:"uppercase",letterSpacing:"1px"}}>Context:</span>
+                <button onClick={()=>setChatContextMode("excerpt")} style={{padding:"4px 12px",fontSize:"11px",borderRadius:"12px",border:"1px solid",cursor:"pointer",fontFamily:UI_FONT,borderColor:chatContextMode==="excerpt"?"#e85d3a":"#e8e6e1",backgroundColor:chatContextMode==="excerpt"?"#f0eeea":"transparent",color:chatContextMode==="excerpt"?"#1a1815":"#a09a93",transition:"all 0.15s"}}>Excerpt Only</button>
+                <button onClick={()=>setChatContextMode("full")} style={{padding:"4px 12px",fontSize:"11px",borderRadius:"12px",border:"1px solid",cursor:"pointer",fontFamily:UI_FONT,borderColor:chatContextMode==="full"?"#e85d3a":"#e8e6e1",backgroundColor:chatContextMode==="full"?"#f0eeea":"transparent",color:chatContextMode==="full"?"#1a1815":"#a09a93",transition:"all 0.15s"}}>Full Book</button>
+                <span style={{fontSize:"10px",color:"#c4bfb8",fontFamily:"'DM Sans', sans-serif",marginLeft:"4px"}}>{chatContextMode==="full"?"Gemini can see the entire book":"Gemini sees hook + caption + context + excerpt"}</span>
               </div>
 
               {/* Messages */}
               <div style={{flex:1,overflowY:"auto",padding:"14px 24px",display:"flex",flexDirection:"column",gap:"10px"}}>
                 {chatMessages.length===0&&!chatLoading&&(
-                  <div style={{textAlign:"center",padding:"40px 20px",color:"#333"}}>
-                    <div style={{fontSize:"11px",fontFamily:"'DM Mono',monospace",marginBottom:"8px"}}>Ask anything about the scene, book, or excerpt</div>
+                  <div style={{textAlign:"center",padding:"40px 20px",color:"#c4bfb8"}}>
+                    <div style={{fontSize:"11px",fontFamily:"'DM Sans', sans-serif",marginBottom:"8px"}}>Ask anything about the scene, book, or excerpt</div>
                     <div style={{display:"flex",flexWrap:"wrap",gap:"6px",justifyContent:"center"}}>
                       {["What happens right before this scene?","Is there a better line from him in this chapter?","What's the emotional context here?","Find me a more intense version of this moment"].map(q=>(
-                        <button key={q} onClick={()=>{setChatInput(q);setTimeout(()=>chatInputRef.current?.focus(),50)}} style={{padding:"5px 10px",fontSize:"10px",borderRadius:"12px",border:"1px solid #1a1a1a",backgroundColor:"#111",color:"#555",cursor:"pointer",fontFamily:UI_FONT,transition:"all 0.15s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor='#333';e.currentTarget.style.color='#888'}} onMouseLeave={e=>{e.currentTarget.style.borderColor='#1a1a1a';e.currentTarget.style.color='#555'}}>{q}</button>
+                        <button key={q} onClick={()=>{setChatInput(q);setTimeout(()=>chatInputRef.current?.focus(),50)}} style={{padding:"5px 10px",fontSize:"10px",borderRadius:"12px",border:"1px solid #e8e6e1",backgroundColor:"#fff",color:"#a09a93",cursor:"pointer",fontFamily:UI_FONT,transition:"all 0.15s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor='#e85d3a';e.currentTarget.style.color='#e85d3a'}} onMouseLeave={e=>{e.currentTarget.style.borderColor='#e8e6e1';e.currentTarget.style.color='#a09a93'}}>{q}</button>
                       ))}
                     </div>
                   </div>
                 )}
                 {chatMessages.map((m,i)=>(
                   <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start",gap:"8px"}}>
-                    <div style={{maxWidth:"75%",padding:"10px 14px",borderRadius:m.role==="user"?"12px 12px 2px 12px":"12px 12px 12px 2px",backgroundColor:m.role==="user"?"#1a1a2e":"#141414",border:`1px solid ${m.isError?"#331a1a":m.role==="user"?"#252540":"#1e1e1e"}`,color:m.isError?"#e55":"#ccc",fontSize:"13px",lineHeight:"1.5",fontFamily:UI_FONT,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>
+                    <div style={{maxWidth:"75%",padding:"10px 14px",borderRadius:m.role==="user"?"12px 12px 2px 12px":"12px 12px 12px 2px",backgroundColor:m.role==="user"?"#e85d3a":"#fff",border:`1px solid ${m.isError?"#f5c6cb":m.role==="user"?"#e85d3a":"#e8e6e1"}`,color:m.isError?"#dc3545":m.role==="user"?"#fff":"#1a1815",fontSize:"13px",lineHeight:"1.5",fontFamily:UI_FONT,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>
                       {m.text}
                     </div>
                   </div>
                 ))}
                 {chatLoading&&(
                   <div style={{display:"flex",justifyContent:"flex-start"}}>
-                    <div style={{padding:"10px 14px",borderRadius:"12px 12px 12px 2px",backgroundColor:"#141414",border:"1px solid #1e1e1e"}}>
+                    <div style={{padding:"10px 14px",borderRadius:"12px 12px 12px 2px",backgroundColor:"#f0eeea",border:"1px solid #e8e6e1"}}>
                       <span style={{display:"inline-flex",gap:"4px",alignItems:"center"}}>
-                        <span style={{width:"6px",height:"6px",borderRadius:"50%",backgroundColor:"#444",animation:"spin 1s linear infinite"}} />
-                        <span style={{fontSize:"12px",color:"#555",fontFamily:"'DM Mono',monospace"}}>Thinking...</span>
+                        <span style={{width:"6px",height:"6px",borderRadius:"50%",backgroundColor:"#e85d3a",animation:"spin 1s linear infinite"}} />
+                        <span style={{fontSize:"12px",color:"#a09a93",fontFamily:"'DM Sans', sans-serif"}}>Thinking...</span>
                       </span>
                     </div>
                   </div>
@@ -1705,9 +1688,9 @@ No markdown, no backticks.
               </div>
 
               {/* Input */}
-              <div style={{padding:"10px 24px 14px",borderTop:"1px solid #141414",display:"flex",gap:"8px",flexShrink:0}}>
-                <input ref={chatInputRef} value={chatInput} onChange={e=>setChatInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendChat()}}} placeholder={apiKey?"Ask about this scene...":"Enter your API key on the Generate tab first"} disabled={!apiKey.trim()} style={{...ST.input,flex:1,fontSize:"13px",padding:"10px 14px",backgroundColor:"#111",borderColor:"#1f1f1f"}} />
-                <button onClick={sendChat} disabled={chatLoading||!chatInput.trim()||!apiKey.trim()} style={{...ST.btn,padding:"10px 20px",backgroundColor:chatLoading||!chatInput.trim()||!apiKey.trim()?"#151515":"#fff",color:chatLoading||!chatInput.trim()||!apiKey.trim()?"#444":"#000",fontSize:"13px",whiteSpace:"nowrap"}}>Send</button>
+              <div style={{padding:"10px 24px 14px",borderTop:"1px solid #f0eeea",display:"flex",gap:"8px",flexShrink:0}}>
+                <input ref={chatInputRef} value={chatInput} onChange={e=>setChatInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendChat()}}} placeholder={apiKey?"Ask about this scene...":"Enter your API key on the Generate tab first"} disabled={!apiKey.trim()} style={{...ST.input,flex:1,fontSize:"13px",padding:"10px 14px",backgroundColor:"#fff",borderColor:"#e8e6e1"}} />
+                <button onClick={sendChat} disabled={chatLoading||!chatInput.trim()||!apiKey.trim()} style={{...ST.btn,padding:"10px 20px",backgroundColor:chatLoading||!chatInput.trim()||!apiKey.trim()?"#f0eeea":"#e85d3a",color:chatLoading||!chatInput.trim()||!apiKey.trim()?"#a09a93":"#fff",fontSize:"13px",whiteSpace:"nowrap"}}>Send</button>
               </div>
             </div>
           )}
