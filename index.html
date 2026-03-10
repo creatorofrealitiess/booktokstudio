@@ -389,14 +389,14 @@ const au=firebase.auth(),db=firebase.database();
 // =============================================
 let messaging=null;
 let notificationsEnabled=false;
+let swRegistration=null;
 
 async function initNotifications(){
   try{
     if(!('Notification' in window)){toast('⚠ Notifications not supported');return}
     if(!('serviceWorker' in navigator)){toast('⚠ Service workers not supported');return}
-    const reg=await navigator.serviceWorker.register('firebase-messaging-sw.js');
+    swRegistration=await navigator.serviceWorker.register('firebase-messaging-sw.js');
     messaging=firebase.messaging();
-    if(messaging.useServiceWorker)messaging.useServiceWorker(reg);
     if(Notification.permission==='granted'){await saveFcmToken();notificationsEnabled=true;updateNotifBtn()}
     messaging.onMessage((payload)=>{
       const n=payload.notification||{};
@@ -418,7 +418,7 @@ async function saveFcmToken(){
   try{
     if(!messaging){toast('⚠ No messaging');return}
     if(!user){toast('⚠ No user');return}
-    const token=await messaging.getToken({vapidKey:'BEtoBJywZpECACDNg3KPItIHwdjQSqv649AeAkWFOBQxVEvYdyMXWFhl58kXsZ_kyNvh-KGrUxZYol4VWWAFB_Q'});
+    const token=await messaging.getToken({vapidKey:'YOUR_VAPID_KEY_HERE',serviceWorkerRegistration:swRegistration});
     if(token){
       await db.ref(`users/${user.uid}/fcmTokens/${token}`).set(true);
       toast('✅ Token saved!');
