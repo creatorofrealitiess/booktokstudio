@@ -378,10 +378,10 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
   <div class="ed-page" id="pgEdit"></div>
   <button class="fab" id="fab" onclick="newPost()">+</button>
   <div class="btabs" id="btabs">
-    <div class="tab-i active" onclick="swTab('accounts')"><div class="tab-ic">&#128100;</div><div class="tab-lb">Accounts</div></div>
+    <div class="tab-i active" onclick="swTab('accounts')"><div class="tab-ic">📲</div><div class="tab-lb">Accounts</div></div>
     <div class="tab-i" onclick="swTab('calendar')"><div class="tab-ic">&#128197;</div><div class="tab-lb">Calendar</div></div>
     <div class="tab-i" onclick="swTab('tasks')"><div class="tab-ic">&#9745;</div><div class="tab-lb">Tasks</div></div>
-    <div class="tab-i" onclick="swTab('taskcal')"><div class="tab-ic">&#128198;</div><div class="tab-lb">Planner</div></div>
+    <div class="tab-i" onclick="swTab('taskcal')"><div class="tab-ic">📝</div><div class="tab-lb">Agenda</div></div>
   </div>
 </div>
 
@@ -520,7 +520,7 @@ const HTAGS=['#arrangedmarriage','#agegapromance','#enemiestolovers','#stalkerro
 const TASK_CATS=['Batch','Draft','Post'];
 const PROJ_KEYS=['RE','DK','PV'];
 
-let user=null,isSignUp=false,curTab='accounts',curAuthor=null,curPostId=null,curFilter='all',postsCache={},allPosts={},edImgs=[],selStatus='draft',calMo=new Date().getMonth(),calYr=new Date().getFullYear(),calFilt='all',navStack=[],profilePics={},openCats={},openSubs={},followers={},follEditAuthor=null;
+let user=null,isSignUp=false,curTab='accounts',curAuthor=null,curPostId=null,curFilter='draft',postsCache={},allPosts={},edImgs=[],selStatus='draft',calMo=new Date().getMonth(),calYr=new Date().getFullYear(),calFilt='all',navStack=[],profilePics={},openCats={},openSubs={},followers={},follEditAuthor=null;
 
 // AUTH
 function togAuth(){isSignUp=!isSignUp;document.getElementById('authBtn').textContent=isSignUp?'Create Account':'Sign In';document.getElementById('authSw').innerHTML=isSignUp?'Have an account? <a onclick="togAuth()">Sign in</a>':'No account? <a onclick="togAuth()">Create one</a>';document.getElementById('authErr').textContent=''}
@@ -601,7 +601,7 @@ db.ref(`users/${user.uid}/posts`).on('value',s=>{allPosts=s.val()||{};cacheSet('
 // TABS
 function swTab(t){curTab=t;curAuthor=null;curPostId=null;navStack=[];document.querySelectorAll('.page,.ed-page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-i').forEach((x,i)=>x.classList.toggle('active',['accounts','calendar','tasks','taskcal'][i]===t));document.getElementById('navBack').style.display='none';document.getElementById('navBrand').style.display='block';document.getElementById('navTitle').style.display='none';document.getElementById('fab').classList.remove('show');document.getElementById('btabs').style.display='flex';if(t==='accounts'){document.getElementById('pgAcc').classList.add('active');renderAcc()}else if(t==='calendar'){document.getElementById('pgCal').classList.add('active');renderCal()}else if(t==='tasks'){document.getElementById('pgTask').classList.add('active');renderTasks()}else if(t==='taskcal'){document.getElementById('pgTaskCal').classList.add('active');renderTaskCal()}}
 
-function showAuth2(aid){curAuthor=AUTHORS.find(a=>a.id===aid);curFilter='all';navStack.push('author');document.querySelectorAll('.page,.ed-page').forEach(p=>p.classList.remove('active'));document.getElementById('pgAuth').classList.add('active');document.getElementById('navBack').style.display='flex';document.getElementById('navBrand').style.display='none';document.getElementById('navTitle').style.display='block';document.getElementById('navTitle').textContent=curAuthor.name;document.getElementById('fab').classList.add('show');renderAuthView()}
+function showAuth2(aid){curAuthor=AUTHORS.find(a=>a.id===aid);curFilter='draft';navStack.push('author');document.querySelectorAll('.page,.ed-page').forEach(p=>p.classList.remove('active'));document.getElementById('pgAuth').classList.add('active');document.getElementById('navBack').style.display='flex';document.getElementById('navBrand').style.display='none';document.getElementById('navTitle').style.display='block';document.getElementById('navTitle').textContent=curAuthor.name;document.getElementById('fab').classList.add('show');renderAuthView()}
 
 function showEd(pid,authId){if(authId){curAuthor=AUTHORS.find(a=>a.id===authId);postsCache=allPosts[authId]||{}}curPostId=pid||null;navStack.push('editor');document.querySelectorAll('.page,.ed-page').forEach(p=>p.classList.remove('active'));document.getElementById('pgEdit').classList.add('active');document.getElementById('navBack').style.display='flex';document.getElementById('navBrand').style.display='none';document.getElementById('navTitle').style.display='block';document.getElementById('navTitle').textContent=pid?'Edit Post':'New Post';document.getElementById('fab').classList.remove('show');document.getElementById('btabs').style.display='none';renderEd()}
 
@@ -712,7 +712,7 @@ const catLabels={BD:'BD',Post:'P'};
 for(const[cat,authors]of Object.entries(merged)){itemsH+=`<div class="tcal-cat-row"><span class="tcal-cat-label">${catLabels[cat]||cat[0]}</span><div class="tcal-authors">${authors.map(a=>{const c=PROJ[a.project]?.color||'#999';return`<span class="tcal-author ${a.done?'tcal-done':''}" style="background:${c}15;color:${c}">${a.author}</span>`}).join('')}</div></div>`}
 cdh+=`<div class="cal-day ${oth?'oth':''} ${ist?'today':''}"><div class="cal-dn">${dn}</div><div class="tcal-day-tasks">${itemsH}</div></div>`}
 
-el.innerHTML=`<div class="sec-hd"><div class="sec-t">Planner</div><button class="task-hd-add" onclick="openTaskModal()">+ Add Task</button></div>
+el.innerHTML=`<div class="sec-hd"><div class="sec-t">Agenda</div><button class="task-hd-add" onclick="openTaskModal()">+ Add Task</button></div>
 <div class="cal-hd"><div class="cal-nav"><button class="cal-nb" onclick="chTcMo(-1)">&#8249;</button><div class="cal-mo">${mos[tcalMo]} ${tcalYr}</div><button class="cal-nb" onclick="chTcMo(1)">&#8250;</button></div><button class="cal-today" onclick="goTcTd()">Today</button></div>
 <div class="cal-grid"><div class="cal-wk">${dys.map(d=>`<div class="cal-wd">${d}</div>`).join('')}</div><div class="cal-days">${cdh}</div></div>
 <div class="cal-legend"><div class="leg-i"><span style="font-size:.6rem;font-weight:700;color:var(--txt3);margin-right:2px">BD</span>Batch+Draft</div><div class="leg-i"><span style="font-size:.6rem;font-weight:700;color:var(--txt3);margin-right:2px">P</span>Post</div><div style="width:8px"></div><div class="leg-i"><div class="leg-d" style="background:var(--re)"></div>RE</div><div class="leg-i"><div class="leg-d" style="background:var(--dk)"></div>DK</div><div class="leg-i"><div class="leg-d" style="background:var(--pv)"></div>PV</div></div>`}
@@ -744,10 +744,10 @@ function togCompleted(hd){hd.nextElementSibling.classList.toggle('open')}
 
 // AUTHOR VIEW
 function renderAuthView(){const el=document.getElementById('pgAuth');const a=curAuthor;const pic=profilePics[a.id];const f=followers[a.id];const follBannerH=followerBannerH(a.id,f);
-el.innerHTML=`<div class="auth-banner"><div style="position:relative;cursor:pointer" onclick="document.getElementById('pfpInput').click()"><div class="auth-big-av" style="background:${PROJ[a.project].color}">${pic?`<img src="${pic}" alt="">`:`${a.init}`}</div><input type="file" id="pfpInput" accept="image/*" style="position:absolute;opacity:0;width:0;height:0" onchange="uploadPfp('${a.id}',this.files[0])"></div><div class="auth-b-info"><h2>${a.handle}</h2><p>${PROJ[a.project].name}</p>${follBannerH}</div></div><div class="filt-row">${['all','draft','ready','posted'].map(f=>`<div class="filt-p ${curFilter===f?'active':''}" onclick="setFilt('${f}')">${f==='all'?'All':f[0].toUpperCase()+f.slice(1)}</div>`).join('')}</div><div class="post-grid" id="postGrid"><div style="text-align:center;padding:30px;grid-column:1/-1"><span class="spinner"></span></div></div>`;renderAuthorPosts()}
+el.innerHTML=`<div class="auth-banner"><div style="position:relative;cursor:pointer" onclick="document.getElementById('pfpInput').click()"><div class="auth-big-av" style="background:${PROJ[a.project].color}">${pic?`<img src="${pic}" alt="">`:`${a.init}`}</div><input type="file" id="pfpInput" accept="image/*" style="position:absolute;opacity:0;width:0;height:0" onchange="uploadPfp('${a.id}',this.files[0])"></div><div class="auth-b-info"><h2>${a.handle}</h2><p>${PROJ[a.project].name}</p>${follBannerH}</div></div><div class="filt-row">${['draft','ready','posted'].map(f=>`<div class="filt-p ${curFilter===f?'active':''}" onclick="setFilt('${f}')">${f[0].toUpperCase()+f.slice(1)}</div>`).join('')}</div><div class="post-grid" id="postGrid"><div style="text-align:center;padding:30px;grid-column:1/-1"><span class="spinner"></span></div></div>`;renderAuthorPosts()}
 function setFilt(f){curFilter=f;renderAuthView()}
 
-function renderAuthorPosts(){const g=document.getElementById('postGrid');if(!g||!curAuthor)return;const data=allPosts[curAuthor.id]||{};postsCache=data;const posts=Object.entries(data).map(([id,p])=>({id,...p})).filter(p=>curFilter==='all'||p.status===curFilter).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+function renderAuthorPosts(){const g=document.getElementById('postGrid');if(!g||!curAuthor)return;const data=allPosts[curAuthor.id]||{};postsCache=data;const posts=Object.entries(data).map(([id,p])=>({id,...p})).filter(p=>p.status===curFilter).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
 if(!posts.length){g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-ic">&#128214;</div><div class="empty-t">No posts yet</div><div class="empty-s">Tap + to create your first post</div></div>';return}
 g.innerHTML=posts.map(p=>`<div class="p-card" onclick="showEd('${p.id}')"><div class="p-card-img">${p.images&&p.images[0]?`<img src="${p.images[0]}" alt="">`:'<div class="no-img">&#128214;</div>'}<div class="p-card-status ${p.status||'draft'}">${p.status||'draft'}</div></div><div class="p-card-body"><div class="p-card-hook">${esc(p.hook||'Untitled')}</div><div class="p-card-meta">${p.scheduledDate?'&#128197; '+p.scheduledDate:''}</div></div></div>`).join('')}
 
@@ -765,12 +765,26 @@ el.innerHTML=`<div class="ed-sec"><div class="ed-lb">&#128247; Slides</div><div 
 <div class="ed-sec"><div class="col-hd" onclick="togCol(this)"><div class="ed-lb" style="margin:0">&#128218; Context</div><span class="arr">&#9660;</span></div><div class="col-bd"><textarea class="ed-ta sm" id="ctxI" placeholder="Book title, tropes...">${esc(p.context||'')}</textarea></div></div>
 <div style="height:70px"></div><div class="save-bar">${curPostId?'<button class="sv-btn out" onclick="delPost()">Delete</button>':''}<button class="sv-btn pri" onclick="savePost()">Save</button></div>`;setupDrop();setupPaste()}
 
-function imgH(s,i){return`<div class="img-it"><img src="${s}" alt=""><button class="img-sv" onclick="event.stopPropagation();dlI(${i})" title="Save">&#8595;</button><button class="img-rm" onclick="event.stopPropagation();rmI(${i})" title="Remove">&#10005;</button></div>`}
+function imgH(s,i){return`<div class="img-it"><img src="${s}" alt="" crossorigin="anonymous"><button class="img-sv" onclick="event.stopPropagation();dlI(${i})" title="Save">&#8595;</button><button class="img-rm" onclick="event.stopPropagation();rmI(${i})" title="Remove">&#10005;</button></div>`}
 function refG(){const g=document.getElementById('imgG');if(g)g.innerHTML=edImgs.map((img,i)=>imgH(img,i)).join('')}
 async function hFiles(fs){for(const f of fs){if(!f.type.startsWith('image/'))continue;edImgs.push(await toDataUrl(f))}refG()}
 function toDataUrl(f){return new Promise(r=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.readAsDataURL(f)})}
 function rmI(i){edImgs.splice(i,1);refG()}
-function dlI(i){window.open(edImgs[i],'_blank')}
+async function dlI(i){
+  try{
+    const src=edImgs[i];
+    // For Storage URLs, fetch as blob and open in new tab for reliable mobile save
+    const resp=await fetch(src);
+    const blob=await resp.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download='slide_'+(i+1)+'.jpg';
+    // iOS Safari doesn't support download attr, so also open in new tab
+    if(/iPhone|iPad/i.test(navigator.userAgent)){window.open(url,'_blank')}
+    else{document.body.appendChild(a);a.click();document.body.removeChild(a)}
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+  }catch(e){window.open(edImgs[i],'_blank')}
+}
 function setupDrop(){const z=document.getElementById('dz');if(!z)return;z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('over')});z.addEventListener('dragleave',()=>z.classList.remove('over'));z.addEventListener('drop',async e=>{e.preventDefault();z.classList.remove('over');await hFiles(e.dataTransfer.files)})}
 function setupPaste(){document.onpaste=async e=>{const items=e.clipboardData?.items;if(!items)return;for(const it of items){if(it.type.startsWith('image/')){e.preventDefault();edImgs.push(await toDataUrl(it.getAsFile()));refG()}}}}
 function togTag(c,t){const inp=document.getElementById('tagI');const cur=inp.value.trim().split(/\s+/).filter(t=>t.startsWith('#'));if(cur.includes(t)){inp.value=cur.filter(x=>x!==t).join(' ');c.classList.remove('active')}else{inp.value=(inp.value.trim()?inp.value.trim()+' ':'')+t;c.classList.add('active')}}
