@@ -784,8 +784,6 @@ async function dlI(i){
     setTimeout(()=>URL.revokeObjectURL(url),30000);
   }catch(e){window.open(edImgs[i],'_blank')}
 }
-  }catch(e){window.open(edImgs[i],'_blank')}
-}
 function setupDrop(){const z=document.getElementById('dz');if(!z)return;z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('over')});z.addEventListener('dragleave',()=>z.classList.remove('over'));z.addEventListener('drop',async e=>{e.preventDefault();z.classList.remove('over');await hFiles(e.dataTransfer.files)})}
 function setupPaste(){document.onpaste=async e=>{const items=e.clipboardData?.items;if(!items)return;for(const it of items){if(it.type.startsWith('image/')){e.preventDefault();edImgs.push(await toDataUrl(it.getAsFile()));refG()}}}}
 function togTag(c,t){const inp=document.getElementById('tagI');const cur=inp.value.trim().split(/\s+/).filter(t=>t.startsWith('#'));if(cur.includes(t)){inp.value=cur.filter(x=>x!==t).join(' ');c.classList.remove('active')}else{inp.value=(inp.value.trim()?inp.value.trim()+' ':'')+t;c.classList.add('active')}}
